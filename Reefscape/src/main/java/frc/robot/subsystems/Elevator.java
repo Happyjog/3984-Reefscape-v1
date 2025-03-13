@@ -1,13 +1,15 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkRelativeEncoder;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,57 +21,57 @@ import frc.robot.Constants;
 
 public class Elevator extends SubsystemBase{
     
-    private CANSparkMax elevatorMotor;
+    private SparkMax elevatorMotor;
+    private SparkMax elevatorMotorWS;
     private RelativeEncoder elevatorMotorEncoder;
-    private SparkPIDController elevatorMotorPID;
-    private Spark intakeMotorL;
-    private Spark intakeMotorR;
+    private SparkClosedLoopController elevatorMotorPID;
+    private SparkClosedLoopController elevatorMotorWSPID;
 
     public Elevator(){
 
-        elevatorMotor = new CANSparkMax(
-            Constants.elevator.rotMotorID,
+        //positive power percentage is elevator up
+        elevatorMotor = new SparkMax(
+            Constants.Swerve.elevator.rotMotorID,
             MotorType.kBrushless
         );
+        SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
+        elevatorMotorConfig.idleMode(IdleMode.kCoast).inverted(false);
+        elevatorMotorConfig.closedLoop.pid(Constants.Swerve.elevator.kP, Constants.Swerve.elevator.kI, Constants.Swerve.elevator.kD);
+        //TODO elevatorMotorConfig.encoder.velocityConversionFactor(())
+        elevatorMotor.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-
-
-        elevatorMotor.restoreFactoryDefaults();
-        elevatorMotor.setIdleMode(IdleMode.kBrake);
-
-        //Initializes encoder for intake's arm
-        
-        elevatorMotorEncoder = elevatorMotor.getEncoder(
-            SparkRelativeEncoder.Type.kHallSensor, 
-            42
+        //positive power percentage is elevator down
+        elevatorMotorWS = new SparkMax(
+            Constants.Swerve.elevator.rotMotorID,
+            MotorType.kBrushless
         );
+        SparkMaxConfig elevatorMotorWSConfig = new SparkMaxConfig();
+        elevatorMotorWSConfig.idleMode(IdleMode.kCoast).inverted(true);
+        elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.kP, Constants.Swerve.elevator.kI, Constants.Swerve.elevator.kD);
+        //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
+        elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
-        // Set Conversion factor for Encoder -> degrees
-        elevatorMotorEncoder.setPositionConversionFactor(
-            360.0/Constants.elevator.gearRatio //TODO
-        ); 
-        // Set Velocity Conversion factor -> degrees/second
-        elevatorMotorEncoder.setVelocityConversionFactor(
-            (360 / Constants.elevator.gearRatio) / 60.0  //TODO
-        );
+        elevatorMotorEncoder = elevatorMotor.getEncoder();
+
         // Set the position to zero
         elevatorMotorEncoder.setPosition(0);
 
-        //Initialize elevator PID
-        elevatorMotorPID = elevatorMotor.getPIDController();
-        elevatorMotorPID.setP(Constants.elevator.kP);
-        elevatorMotorPID.setI(Constants.elevator.kI);
-        elevatorMotorPID.setD(Constants.elevator.kD);
 
-        elevatorMotor.burnFlash();
+
+        //Initializes encoder for intake's arm
+
+
+
+        // Set Conversion factor for Encoder -> degrees 
+
     }
     
    
     public Command Stop(){
         return run(()->{
-            intakeMotorL.stopMotor();
-            intakeMotorR.stopMotor();
+            elevatorMotor.set(0);
+            elevatorMotorWS.set(0);
         });
     }
 
@@ -86,7 +88,7 @@ public class Elevator extends SubsystemBase{
     public void GoTo(Rotation2d goal){
         elevatorMotorPID.setReference(
             goal.getDegrees(), 
-            ControlType.kPosition, 0
+            ControlType.kPosition, ClosedLoopSlot.kSlot0
         );
         
     }

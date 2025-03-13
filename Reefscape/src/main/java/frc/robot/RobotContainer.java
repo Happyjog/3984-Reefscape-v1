@@ -54,14 +54,14 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kRightBumper.value);
   private final JoystickButton slow = 
     new JoystickButton(driver, XboxController.Button.kLeftBumper.value);*/
-  private final Flywheel fwheel = new Flywheel();
+  // private final Flywheel fwheel = new Flywheel();
   // private final PhotonCamera cam = new PhotonCamera("Global_Shutter_Camera");
   // private final PhotonCamera cam2 = new PhotonCamera("Microsoft_LifeCam_HD-3000");
   //private final SendableChooser<Command> autoChooser;
-  private final Swerve s_Swerve = new Swerve();
-  private final Intake intake = new Intake();  
+  // private final Swerve s_Swerve = new Swerve();
+  // private final Intake intake = new Intake();  
   //private final aimAtTarget aimCommand = new aimAtTarget(cam, s_Swerve, s_Swerve::getPose);
-  private final moveToNearestApriltagCommand translateApriltag = new moveToNearestApriltagCommand(s_Swerve, s_Swerve::getPose, 0);
+  // private final moveToNearestApriltagCommand translateApriltag = new moveToNearestApriltagCommand(s_Swerve, s_Swerve::getPose, 0);
     /* The container for the robot. subsystems, OI devices, and commands. */
   public RobotContainer() {
     // NamedCommands.registerCommand("Launch", intake.Out().withTimeout(0.2));
@@ -74,25 +74,25 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
     // SmartDashboard.putData("AutoChooser", autoChooser);
-    s_Swerve.setDefaultCommand(
-      new TeleopSwerve(
-        s_Swerve,
-        () -> -driver.getLeftY(),//-driver.getRwAxis(translationAxis),
-        () -> driver.getLeftX(),//-driver.getRawAxis(strafeAxis),
-        () -> -driver.getRightX(),//-driver.getRawAxis(rotationAxis),
-        ()->false,//() -> robotCentric.getAsBoolean(),
-        () -> driver.leftBumper().getAsBoolean(),
-        () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
-    intake.setDefaultCommand(
-      intake.Stop()
-      //intake.moveTo(Constants.Swerve.intake.IDLE, false)
-    );
-    fwheel.setDefaultCommand(
-      fwheel.stop()
+    // s_Swerve.setDefaultCommand(
+    //   new TeleopSwerve(
+    //     s_Swerve,
+    //     () -> -driver.getLeftY(),//-driver.getRwAxis(translationAxis),
+    //     () -> driver.getLeftX(),//-driver.getRawAxis(strafeAxis),
+    //     () -> -driver.getRightX(),//-driver.getRawAxis(rotationAxis),
+    //     ()->false,//() -> robotCentric.getAsBoolean(),
+    //     () -> driver.leftBumper().getAsBoolean(),
+    //     () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
+    // intake.setDefaultCommand(
+    //   intake.Stop()
+    //   //intake.moveTo(Constants.Swerve.intake.IDLE, false)
+    // );
+    // fwheel.setDefaultCommand(
+    //   fwheel.stop()
       /*fwheel.moveTo(
         ()->amp.getAsBoolean(), 
         ()->speaker.getAsBoolean(), 
-        ()-> driver.getRawAxis(triggerLAxis))*/);
+        ()-> driver.getRawAxis(triggerLAxis))*/
     // Configure the button bindings
     configureButtonBindings();
     
@@ -109,11 +109,11 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     //aim.whileTrue(aimCommand);
-    driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    // driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     //second.y().whileTrue(fwheel.ampShot());
-    driver.b().onTrue(translateApriltag);
+    // driver.b().onTrue(translateApriltag);
     // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1, s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
-    driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
+    // driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
     //second.rightTrigger(0.3).whileTrue(intake.Out());
     //second.leftTrigger(0.3).whileTrue(fwheel.moveTo(flywheel.SPEAKER, flywheel.SPEAKER, false, ()->driver.leftTrigger(0.3).getAsBoolean(), note));
     //second.leftTrigger(0.3).whileTrue(fwheel.speakerShot());
