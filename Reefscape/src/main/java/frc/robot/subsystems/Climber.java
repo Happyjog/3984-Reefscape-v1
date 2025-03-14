@@ -16,6 +16,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,21 +48,25 @@ public class Climber extends SubsystemBase{
     }
 
 
-    public double getVelocity(){
+    public double summonPosition(){
          //RPM
-        return climbMotorEncoder.getVelocity();
+        return climbMotorEncoder.getPosition();
     }
-    public double[] getErrors(double[] goal){
-        double[] currVelocity = new double[] {getVelocity()[0], getVelocity()[1]};
-        double[] error = new double[] {
-            goal[0] - currVelocity[0] , goal[1] - currVelocity[1]
-        };
+     public Rotation2d getPos(){
+        Rotation2d posClimb = Rotation2d.fromDegrees(-climbMotorEncoder.getPosition()); 
+        return posClimb;
+    }
+
+    public Rotation2d getError(Rotation2d goal){
+        Rotation2d currPos = getPos();
+        Rotation2d error = Rotation2d.fromDegrees(currPos.getDegrees() - goal.getDegrees());
         return error;
     }
-    public void GoTo(double goal){
+
+    public void GoTo(Rotation2d goal){
         climbMotorPID.setReference(
-            goal,
-            ControlType.kVelocity, ClosedLoopSlot.kSlot0, new SimpleMotorFeedforward(0, 0.1).calculate(goal)
+            goal.getDegrees(), 
+            ControlType.kPosition, ClosedLoopSlot.kSlot0
         );
     }
     private boolean atSetpoint = false;
@@ -95,30 +100,30 @@ public class Climber extends SubsystemBase{
        
     }*/
     public Command stop(){
-        return run(()->{climbMotor.set(0); bott.set(0);});
+        return run(()->{climbMotor.set(0); climbMotor.set(0);});
     }
-    public Command ampShot(){
-        return run(()->{climbMotor.setVoltage(1.70); bott.setVoltage(1.70);});
-    }
+
     /*public Command speakerShot(){
         return run(()->{top.set(0.4); bott.set(0.4);});
     }*/
 
-
-    public Command moveTo(double vtop, double vbott, boolean idleState, BooleanSupplier trigger, boolean note){
-        double[] v  =new double[]{vtop, vbott};
+    public Command moveTo(Rotation2d goal){
+        
         //Rotation2d[] a = new Rotation2d[]{Rotation2d.fromDegrees(Sangle)/*(49.26)/*getAngles(x, y)[0]*/, Rotation2d.fromDegrees(Jangle)};/*(61.97)};// getAngles(x, y)[1]};*/
         return runOnce(()->{
-            SmartDashboard.putNumber("Shoulder Goal", v[0]);
-            SmartDashboard.putNumber("Joint Goal", v[1]);
+            SmartDashboard.putNumber("Goal", goal.getDegrees());
         }).andThen(run(
-            () -> {GoTo(v[0], v[1]);
-            double[] getVelocity = this.getVelocity();
-            System.out.println(getVelocity);
-            }
+            () -> GoTo(goal)
+        ).until(
+            ()->(
+                Math.abs(getError(goal).getDegrees()) < Constants.Swerve.climber.tolerance
+            ))
+        );
+    }
+    
 
 
-        )/* .until(
+        /* .until(
             ()->(
                 (Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance
                 && Math.abs(getErrors(v)[1]) < Constants.Swerve.flywheel.tolerance) && !trigger.getAsBoolean()
