@@ -72,18 +72,13 @@ public class Elevator extends SubsystemBase{
             MotorType.kBrushed
         );
         SparkMaxConfig outtakeMotorConfig = new SparkMaxConfig();
-        elevatorMotorEncoder = new Encoder();//elevatorMotor.getEncoder();
+        elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1,Constants.Swerve.throBoreAbsoluteChannel);//elevatorMotor.getEncoder();
 
         // Set the position to zero
-        elevatorMotorEncoder.setPosition(0);
-
-
-
-        // Set Conversion factor for Encoder -> degrees 
-
+        elevatorMotorEncoder.reset();
     }
     public void reset(){
-        elevatorMotorEncoder.setPosition(0);
+        elevatorMotorEncoder.reset();
     }
     
    
@@ -95,7 +90,7 @@ public class Elevator extends SubsystemBase{
     }
 
     public Rotation2d getPos(){
-        Rotation2d posElevatorMotor = Rotation2d.fromDegrees(elevatorMotorEncoder.getPosition()); 
+        Rotation2d posElevatorMotor = Rotation2d.fromDegrees(elevatorMotorEncoder.get()); 
         return posElevatorMotor;
     }
     public Rotation2d getErrors(Rotation2d goal){

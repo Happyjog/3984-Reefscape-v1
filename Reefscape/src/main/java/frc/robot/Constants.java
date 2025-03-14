@@ -109,10 +109,9 @@ public final class Constants {
         /* DIO PORTS */
         public static final int limitSwitch1ID = 0;
         public static final int limitSwitch2ID = 1;
-        public static final int throBore1 = -11111;
-        public static final int throBore2 = -11111;
-        public static final int throBore3 = -11111;
-        public static final int throBore4 = -11111;
+        public static final int throBoreAbsoluteChannel = 0;
+        public static final int throBoreRelativeChannel1 = 1;
+        public static final int throBoreRelativeChannel2 = 2;
 
         
 
