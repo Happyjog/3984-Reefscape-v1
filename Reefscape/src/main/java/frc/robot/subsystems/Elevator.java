@@ -10,6 +10,11 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PWM;
+
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -23,48 +28,62 @@ public class Elevator extends SubsystemBase{
     
     private SparkMax elevatorMotor;
     private SparkMax elevatorMotorWS;
-    private RelativeEncoder elevatorMotorEncoder;
+    private SparkMax outtakeMotor;
+    private SparkMax outtakeMotorWS;
+    private PWM ratchetServo;
+    private PWM trapServo;
+    private DigitalInput limitSwitch1;
+    private DigitalInput limitSwitch2;
+    private Encoder elevatorMotorEncoder;
+    // private RelativeEncoder elevatorMotorEncoder;
     private SparkClosedLoopController elevatorMotorPID;
     private SparkClosedLoopController elevatorMotorWSPID;
 
     public Elevator(){
-
+        ratchetServo = new PWM(Constants.Swerve.ratchetServoID);
+        trapServo = new PWM(Constants.Swerve.trapServoID);
+        limitSwitch1 = new DigitalInput(Constants.Swerve.limitSwitch1ID);
+        limitSwitch2 = new DigitalInput(Constants.Swerve.limitSwitch2ID);        
         //positive power percentage is elevator up
         elevatorMotor = new SparkMax(
-            Constants.Swerve.elevator.rotMotorID,
+            Constants.Swerve.elevator.elevatorShaft.shaftMotorID,
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
         elevatorMotorConfig.idleMode(IdleMode.kCoast).inverted(false);
-        elevatorMotorConfig.closedLoop.pid(Constants.Swerve.elevator.kP, Constants.Swerve.elevator.kI, Constants.Swerve.elevator.kD);
+        elevatorMotorConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
         //TODO elevatorMotorConfig.encoder.velocityConversionFactor(())
         elevatorMotor.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         //positive power percentage is elevator down
         elevatorMotorWS = new SparkMax(
-            Constants.Swerve.elevator.rotMotorID,
+            Constants.Swerve.elevator.elevatorShaft.shaftMotorID,
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorWSConfig = new SparkMaxConfig();
         elevatorMotorWSConfig.idleMode(IdleMode.kCoast).inverted(true);
-        elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.kP, Constants.Swerve.elevator.kI, Constants.Swerve.elevator.kD);
+        elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
         //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
-        elevatorMotorEncoder = elevatorMotor.getEncoder();
+        outtakeMotor = new SparkMax(
+            Constants.Swerve.elevator.elevatorOuttake.outtakeMotorID,
+            MotorType.kBrushed
+        );
+        SparkMaxConfig outtakeMotorConfig = new SparkMaxConfig();
+        elevatorMotorEncoder = new Encoder();//elevatorMotor.getEncoder();
 
         // Set the position to zero
         elevatorMotorEncoder.setPosition(0);
 
 
 
-        //Initializes encoder for intake's arm
-
-
-
         // Set Conversion factor for Encoder -> degrees 
 
+    }
+    public void reset(){
+        elevatorMotorEncoder.setPosition(0);
     }
     
    
@@ -111,6 +130,10 @@ public class Elevator extends SubsystemBase{
         );
     }
     public void periodic(){
+        if (limitSwitch1.get() && limitSwitch2.get()){
+            reset();
+        }
+
         SmartDashboard.putNumber("IntakePos", getPos().getDegrees());
     }
 }

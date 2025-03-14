@@ -1,6 +1,9 @@
+
 package frc.robot.subsystems;
 
+
 import java.util.function.BooleanSupplier;
+
 
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -18,44 +21,35 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Climber extends SubsystemBase{
-    private SparkMax top;
-    private SparkMax bott;
-    private RelativeEncoder topEncoder;
-    private RelativeEncoder bottEncoder;
-    private SparkClosedLoopController FWtopPID;
-    private SparkClosedLoopController FWbottPID;
-    public Climber() {
-        // initialies all the variables and constants 
-        top = new SparkMax(frc.robot.Constants.Swerve.flywheel.FWtop.FWid, MotorType.kBrushless );
-        bott = new SparkMax(frc.robot.Constants.Swerve.flywheel.FWbott.FWid, MotorType.kBrushless );
-        SparkMaxConfig topconfig = new SparkMaxConfig();
-        topconfig.idleMode(IdleMode.kCoast).inverted(false);
-        topconfig.encoder.velocityConversionFactor((Math.PI * Constants.Swerve.flywheel.FWDiameter * 0.0254 / Constants.Swerve.flywheel.FWtop.gearRatio) / 60.0 );
-        topconfig.closedLoop.pid(Constants.Swerve.flywheel.FWtop.kP, Constants.Swerve.flywheel.FWtop.kI, Constants.Swerve.flywheel.FWtop.kD);
-        top.configure(topconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        SparkMaxConfig bottConfig = new SparkMaxConfig();
-        bottConfig.idleMode(IdleMode.kCoast).inverted(true);
-        bottConfig.encoder.velocityConversionFactor((Math.PI * Constants.Swerve.flywheel.FWDiameter * 0.0254 / Constants.Swerve.flywheel.FWbott.gearRatio) / 60.0);
-        bottConfig.closedLoop.pid(Constants.Swerve.flywheel.FWbott.kP, Constants.Swerve.flywheel.FWbott.kI, Constants.Swerve.flywheel.FWbott.kD);
-        bott.configure(bottConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        
-        topEncoder = top.getEncoder();
-        topEncoder.setPosition(0);
-        bottEncoder = bott.getEncoder();
-        bottEncoder.setPosition(0);
-        
-        FWtopPID = top.getClosedLoopController();
 
-        FWbottPID = bott.getClosedLoopController();
+public class Climber extends SubsystemBase{
+    private SparkMax climbMotor;
+    private RelativeEncoder climbMotorEncoder;
+    private SparkClosedLoopController climbMotorPID;
+    public Climber() {
+        // initialies all the variables and constants
+        climbMotor = new SparkMax(frc.robot.Constants.Swerve.climber.rotMotorID, MotorType.kBrushless );
+        SparkMaxConfig climbMotorConfig = new SparkMaxConfig();
+        climbMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
+        climbMotorConfig.closedLoop.pid(Constants.Swerve.flywheel.FWtop.kP, Constants.Swerve.flywheel.FWtop.kI, Constants.Swerve.flywheel.FWtop.kD);
+        climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
+       
+        climbMotorEncoder = climbMotor.getEncoder();
+        climbMotorEncoder.setPosition(0);
+
+
+       
+        climbMotorPID = climbMotor.getClosedLoopController();
+
+
     }
 
-    public double[] getVelocity(){
-        double topVelocity = topEncoder.getVelocity(); //RPM
-        double bottVelocity = bottEncoder.getVelocity();
-        double[] combinedVelocity = 
-        new double[] {topVelocity , bottVelocity};
-        return combinedVelocity;
+
+    public double getVelocity(){
+         //RPM
+        return climbMotorEncoder.getVelocity();
     }
     public double[] getErrors(double[] goal){
         double[] currVelocity = new double[] {getVelocity()[0], getVelocity()[1]};
@@ -64,17 +58,14 @@ public class Climber extends SubsystemBase{
         };
         return error;
     }
-    public void GoTo(double topGoal, double bottGoal){
-        FWtopPID.setReference(
-            topGoal, 
-            ControlType.kVelocity, ClosedLoopSlot.kSlot0, new SimpleMotorFeedforward(0, 0.1).calculate(topGoal)
-        );
-        FWbottPID.setReference(
-            bottGoal, 
-            ControlType.kVelocity, ClosedLoopSlot.kSlot0, new SimpleMotorFeedforward(0, 0.1).calculate(bottGoal)
+    public void GoTo(double goal){
+        climbMotorPID.setReference(
+            goal,
+            ControlType.kVelocity, ClosedLoopSlot.kSlot0, new SimpleMotorFeedforward(0, 0.1).calculate(goal)
         );
     }
     private boolean atSetpoint = false;
+
 
     /*public Command moveTo(BooleanSupplier amp, BooleanSupplier speaker, DoubleSupplier trigger){
         final double[] v = new double[]{(amp.getAsBoolean())? flywheel.AMP: flywheel.SPEAKER, (amp.getAsBoolean())? flywheel.AMP: flywheel.SPEAKER};
@@ -91,7 +82,7 @@ public class Climber extends SubsystemBase{
                     )
                 ).until(
                     ()->(
-                        Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance 
+                        Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance
                         && Math.abs(getErrors(v)[1]) < Constants.Swerve.flywheel.tolerance
                     )).andThen(runOnce(()->{
                         atSetpoint = true;
@@ -101,17 +92,18 @@ public class Climber extends SubsystemBase{
         else{
             return runOnce(()->{});
         }
-        
+       
     }*/
     public Command stop(){
-        return run(()->{top.set(0); bott.set(0);});
+        return run(()->{climbMotor.set(0); bott.set(0);});
     }
     public Command ampShot(){
-        return run(()->{top.setVoltage(1.70); bott.setVoltage(1.70);});
+        return run(()->{climbMotor.setVoltage(1.70); bott.setVoltage(1.70);});
     }
     /*public Command speakerShot(){
         return run(()->{top.set(0.4); bott.set(0.4);});
     }*/
+
 
     public Command moveTo(double vtop, double vbott, boolean idleState, BooleanSupplier trigger, boolean note){
         double[] v  =new double[]{vtop, vbott};
@@ -125,9 +117,10 @@ public class Climber extends SubsystemBase{
             System.out.println(getVelocity);
             }
 
+
         )/* .until(
             ()->(
-                (Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance 
+                (Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance
                 && Math.abs(getErrors(v)[1]) < Constants.Swerve.flywheel.tolerance) && !trigger.getAsBoolean()
             )).andThen(runOnce(()->{
                 if (idleState){
@@ -150,10 +143,11 @@ public class Climber extends SubsystemBase{
             System.out.println(getVelocity);
             }
 
+
         ) .until(
             ()->(
-                (Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance 
-                && Math.abs(getErrors(v)[1]) < Constants.Swerve.flywheel.tolerance) 
+                (Math.abs(getErrors(v)[0]) < Constants.Swerve.flywheel.tolerance
+                && Math.abs(getErrors(v)[1]) < Constants.Swerve.flywheel.tolerance)
             )).andThen(runOnce(()->{
                 if (idleState){
                     atSetpoint = false;
@@ -168,4 +162,9 @@ public class Climber extends SubsystemBase{
         SmartDashboard.putNumber("lywhell Vellovity", getVelocity()[0]);
     }
 
+
 }
+
+
+
+
