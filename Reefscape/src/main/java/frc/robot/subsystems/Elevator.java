@@ -31,8 +31,7 @@ public class Elevator extends SubsystemBase{
     
     private SparkMax elevatorMotor;
     private SparkMax elevatorMotorWS;
-    private SparkMax outtakeMotor;
-    private SparkMax outtakeMotorWS;
+    
     private PWM trapServo;
     private DigitalInput limitSwitch1;
     private DigitalInput limitSwitch2;
@@ -67,19 +66,6 @@ public class Elevator extends SubsystemBase{
         //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-
-        outtakeMotor = new SparkMax(
-            Constants.Swerve.elevator.elevatorOuttake.outtakeMotorID,
-            MotorType.kBrushed
-        );
-        SparkMaxConfig outtakeMotorConfig = new SparkMaxConfig();
-
-        outtakeMotorWS = new SparkMax(
-            Constants.Swerve.elevator.elevatorOuttake.outtakeMotorWSID,
-            MotorType.kBrushed
-        );
-        SparkMaxConfig outtakeMotorConfigWS = new SparkMaxConfig();
-        elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1,Constants.Swerve.throBoreRelativeChannel2);//elevatorMotor.getEncoder();
 
         // Set the position to zero
         elevatorMotorEncoder.reset();
@@ -161,32 +147,7 @@ public Command manualShaftControl(BooleanSupplier up, BooleanSupplier down){
     });
 
 }
-public void OuttakeOut(){
-    outtakeMotorWS.set(-.5);
-    outtakeMotor.set(-.5);
-}
-public void OuttakeIn(){
-    outtakeMotor.set(.5);
-    outtakeMotorWS.set(.5);
-}
-public void OuttakeStopManual(){
-    outtakeMotor.stopMotor();
-    outtakeMotorWS.stopMotor();
-}
-public Command manualOuttakeControl(BooleanSupplier up, BooleanSupplier down){
-    return run(()->{
-        if (up.getAsBoolean()){
-           OuttakeIn();
-        }
-        else if (down.getAsBoolean()){
-            OuttakeOut();
-        }
-        else{
-            OuttakeStopManual();
-        }
-    });
 
-}
 
 public void periodic(){
     if (limitSwitch1.get() && limitSwitch2.get()){

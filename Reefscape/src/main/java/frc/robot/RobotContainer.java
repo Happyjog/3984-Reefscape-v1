@@ -25,6 +25,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Spitter;
 import frc.robot.Constants.Swerve.flywheel;
 
 /**
@@ -63,6 +64,7 @@ public class RobotContainer {
   private final Swerve s_Swerve = new Swerve();
   private final Elevator s_Elevator = new Elevator();
   private final Climber s_Climber = new Climber();
+  private final Spitter s_Spitter = new Spitter();
   // private final Intake intake = new Intake();  
   //private final aimAtTarget aimCommand = new aimAtTarget(cam, s_Swerve, s_Swerve::getPose);
   // private final moveToNearestApriltagCommand translateApriltag = new moveToNearestApriltagCommand(s_Swerve, s_Swerve::getPose, 0);

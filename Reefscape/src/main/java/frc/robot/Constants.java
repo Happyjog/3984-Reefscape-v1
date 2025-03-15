@@ -202,12 +202,12 @@ public final class Constants {
                 public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
                         Rotation2d.fromDegrees(2022) };
                 }
-                        
-            public static final class elevatorOuttake{
-                public static final int outtakeMotorID = 5;
-                public static final int outtakeMotorWSID = 8;
-            }
             
+        }
+
+        public static final class Outtake{
+            public static final int outtakeMotorID = 5;
+            public static final int outtakeMotorWSID = 8;
         }
 
         public static final class climber {
