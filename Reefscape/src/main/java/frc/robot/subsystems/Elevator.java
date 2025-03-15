@@ -62,7 +62,7 @@ public class Elevator extends SubsystemBase{
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorWSConfig = new SparkMaxConfig();
-        elevatorMotorWSConfig.idleMode(IdleMode.kBrake).inverted(true);
+        elevatorMotorWSConfig.idleMode(IdleMode.kBrake).inverted(false);
         elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
         //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -135,12 +135,12 @@ public class Elevator extends SubsystemBase{
 
  // Manual Controls:
  public void ShaftUp(){
-    // elevatorMotorWS.set(.01);
-    elevatorMotor.set(.01);
+    elevatorMotorWS.set(-.05);
+    // elevatorMotor.set(.05);
 }
 public void ShaftDown(){
-    elevatorMotor.set(-.01);
-    // elevatorMotorWS.set(-.01);
+    // elevatorMotor.set(-.05);
+    elevatorMotorWS.set(.05);
 }
 public void ShaftStopManual(){
     elevatorMotor.stopMotor();
