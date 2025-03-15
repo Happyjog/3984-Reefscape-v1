@@ -87,19 +87,19 @@ public class RobotContainer {
         ()->false,//() -> robotCentric.getAsBoolean(),
         () -> driver.leftBumper().getAsBoolean(),
         () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
-      // s_Elevator.setDefaultCommand(
-      //   // s_Elevator.manualShaftControl(
-      //   //   ()-> driver.leftBumper().getAsBoolean(), 
-      //   //   ()-> driver.rightBumper().getAsBoolean())
-      //     // s_Elevator.manualOuttakeControl(
-      //     //   ()-> driver.leftBumper().getAsBoolean(), 
-      //     //   ()-> driver.rightBumper().getAsBoolean())
-      // );
-      s_Climber.setDefaultCommand(
-        s_Climber.manualControl(
+      s_Elevator.setDefaultCommand(
+        s_Elevator.manualShaftControl(
           ()-> driver.leftBumper().getAsBoolean(), 
           ()-> driver.rightBumper().getAsBoolean())
+          // s_Elevator.manualOuttakeControl(
+          //   ()-> driver.leftBumper().getAsBoolean(), 
+          //   ()-> driver.rightBumper().getAsBoolean())
       );
+      // s_Climber.setDefaultCommand(
+      //   s_Climber.manualControl(
+      //     ()-> driver.leftBumper().getAsBoolean(), 
+      //     ()-> driver.rightBumper().getAsBoolean())
+      // );
         // intake.setDefaultCommand(
     //   intake.Stop()
     //   //intake.moveTo(Constants.Swerve.intake.IDLE, false)
@@ -122,10 +122,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private boolean note = false;
 
   private void configureButtonBindings() {
-    //aim.whileTrue(aimCommand);
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
     // driver.a().onTrue(s_Climber.ratchetControl());

@@ -135,12 +135,12 @@ public class Elevator extends SubsystemBase{
 
  // Manual Controls:
  public void ShaftUp(){
-    elevatorMotorWS.set(.5);
-    elevatorMotor.set(.5);
+    // elevatorMotorWS.set(.01);
+    elevatorMotor.set(.01);
 }
 public void ShaftDown(){
-    elevatorMotor.set(.5);
-    elevatorMotorWS.set(.5);
+    elevatorMotor.set(-.01);
+    // elevatorMotorWS.set(-.01);
 }
 public void ShaftStopManual(){
     elevatorMotor.stopMotor();
