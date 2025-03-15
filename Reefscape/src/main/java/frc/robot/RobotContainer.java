@@ -105,10 +105,8 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private boolean note = false;
 
   private void configureButtonBindings() {
-    //aim.whileTrue(aimCommand);
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
     // driver.b().onTrue(translateApriltag);
