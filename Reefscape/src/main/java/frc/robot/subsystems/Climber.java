@@ -38,7 +38,6 @@ public class Climber extends SubsystemBase{
         climbMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
         climbMotorConfig.closedLoop.pid(Constants.Swerve.flywheel.FWtop.kP, Constants.Swerve.flywheel.FWtop.kI, Constants.Swerve.flywheel.FWtop.kD);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        SmartDashboard.putBoolean("Rachet Locked?", true);
 
 
        
@@ -141,7 +140,12 @@ public class Climber extends SubsystemBase{
             }))*/
         
     public boolean ratchetControl(BooleanSupplier pos){
-        ratchetServo.setPosition((pos.getAsBoolean()) ? 0 : 1);
+        if(pos.getAsBoolean()){
+            ratchetServo.setPosition(0);
+        }else{
+            ratchetServo.setPosition(1);
+        }
+        // ratchetServo.setPosition((pos.getAsBoolean()) ? 0 : 1);
         return pos.getAsBoolean();
     }
 
