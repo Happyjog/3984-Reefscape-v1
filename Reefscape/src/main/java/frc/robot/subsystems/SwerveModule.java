@@ -67,6 +67,7 @@ public class SwerveModule {
     configDriveMotor();
 
     lastAngle = getState().angle;
+    // resetToAbsolute();
   }
 
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
@@ -81,8 +82,8 @@ public class SwerveModule {
   public void resetToAbsolute() {
     double absolutePosition = getCanCoder().getDegrees() - angleOffset.getDegrees();
     System.out.println(moduleNumber + "set to "+ absolutePosition);
-
-    integratedAngleEncoder.setPosition(360-getCanCoder().getDegrees()+angleOffset.getDegrees());
+//360-getCanCoder().getDegrees()+angleOffset.getDegrees()
+    integratedAngleEncoder.setPosition(absolutePosition);
     
   }
   private double optimizeAngle(Rotation2d currentAngle, Rotation2d targetAngle){

@@ -58,7 +58,7 @@ public class RobotContainer {
   // private final PhotonCamera cam = new PhotonCamera("Global_Shutter_Camera");
   // private final PhotonCamera cam2 = new PhotonCamera("Microsoft_LifeCam_HD-3000");
   //private final SendableChooser<Command> autoChooser;
-  // private final Swerve s_Swerve = new Swerve();
+  private final Swerve s_Swerve = new Swerve();
   // private final Intake intake = new Intake();  
   //private final aimAtTarget aimCommand = new aimAtTarget(cam, s_Swerve, s_Swerve::getPose);
   // private final moveToNearestApriltagCommand translateApriltag = new moveToNearestApriltagCommand(s_Swerve, s_Swerve::getPose, 0);
@@ -74,15 +74,15 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
     // SmartDashboard.putData("AutoChooser", autoChooser);
-    // s_Swerve.setDefaultCommand(
-    //   new TeleopSwerve(
-    //     s_Swerve,
-    //     () -> -driver.getLeftY(),//-driver.getRwAxis(translationAxis),
-    //     () -> driver.getLeftX(),//-driver.getRawAxis(strafeAxis),
-    //     () -> -driver.getRightX(),//-driver.getRawAxis(rotationAxis),
-    //     ()->false,//() -> robotCentric.getAsBoolean(),
-    //     () -> driver.leftBumper().getAsBoolean(),
-    //     () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
+    s_Swerve.setDefaultCommand(
+      new TeleopSwerve(
+        s_Swerve,
+        () -> -driver.getLeftY(),//-driver.getRwAxis(translationAxis),
+        () -> driver.getLeftX(),//-driver.getRawAxis(strafeAxis),
+        () -> -driver.getRightX(),//-driver.getRawAxis(rotationAxis),
+        ()->false,//() -> robotCentric.getAsBoolean(),
+        () -> driver.leftBumper().getAsBoolean(),
+        () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
     // intake.setDefaultCommand(
     //   intake.Stop()
     //   //intake.moveTo(Constants.Swerve.intake.IDLE, false)
@@ -109,8 +109,8 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     //aim.whileTrue(aimCommand);
-    // driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    //second.y().whileTrue(fwheel.ampShot());
+    driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
     // driver.b().onTrue(translateApriltag);
     // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1, s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
     // driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
