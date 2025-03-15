@@ -94,6 +94,11 @@ public class RobotContainer {
           ()-> driver.leftBumper().getAsBoolean(), 
           ()-> driver.rightBumper().getAsBoolean())
       );
+      s_Spitter.setDefaultCommand(
+        s_Spitter.manualOuttakeControl(
+          ()-> driver.a().getAsBoolean(), 
+          ()->driver.b().getAsBoolean())
+      );
       // s_Climber.setDefaultCommand(
       //   s_Climber.manualControl(
       //     ()-> driver.leftBumper().getAsBoolean(), 
@@ -125,9 +130,6 @@ public class RobotContainer {
   private void configureButtonBindings() {
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
-    driver.a().onTrue(new RunCommand(()->s_Elevator.OuttakeIn()));
-    driver.b().onTrue(new RunCommand(()->s_Elevator.OuttakeOut()));
-    driver.start().onTrue(new RunCommand(()->s_Elevator.OuttakeStopManual()));
 
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);

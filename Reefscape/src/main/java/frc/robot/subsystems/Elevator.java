@@ -65,7 +65,7 @@ public class Elevator extends SubsystemBase{
         elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
         //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+        elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1, Constants.Swerve.throBoreRelativeChannel2);
 
         // Set the position to zero
         elevatorMotorEncoder.reset();
@@ -150,10 +150,10 @@ public Command manualShaftControl(BooleanSupplier up, BooleanSupplier down){
 
 
 public void periodic(){
-    // if (limitSwitch1.get() && limitSwitch2.get()){
-    //     System.out.println("TUREUUEIRUENRIUEWNR");
-    //     reset();
-    // }
+    if (!limitSwitch1.get() && !limitSwitch2.get()){
+        System.out.println("TUREUUEIRUENRIUEWNR");
+        reset();
+    }
 
     SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
 }
