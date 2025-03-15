@@ -122,10 +122,10 @@ public class Elevator extends SubsystemBase{
  // Manual Controls:
  public void ShaftUp(){
     elevatorMotorWS.set(-.05);
-    // elevatorMotor.set(.05);
+    elevatorMotor.set(.05);
 }
 public void ShaftDown(){
-    // elevatorMotor.set(-.05);
+    elevatorMotor.set(-.05);
     elevatorMotorWS.set(.05);
 }
 public void ShaftStopManual(){
@@ -150,9 +150,10 @@ public Command manualShaftControl(BooleanSupplier up, BooleanSupplier down){
 
 
 public void periodic(){
-    if (limitSwitch1.get() && limitSwitch2.get()){
-        reset();
-    }
+    // if (limitSwitch1.get() && limitSwitch2.get()){
+    //     System.out.println("TUREUUEIRUENRIUEWNR");
+    //     reset();
+    // }
 
     SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
 }
