@@ -140,9 +140,12 @@ public class Climber extends SubsystemBase{
                 }
             }))*/
         
-    public void ratchetControl(BooleanSupplier pos){
+    public boolean ratchetControl(BooleanSupplier pos){
         ratchetServo.setPosition((pos.getAsBoolean()) ? 0 : 1);
+        return pos.getAsBoolean();
     }
+
+
     
     public Command moveTill(double goalPos, boolean idleState){
         double p  = goalPos;
@@ -211,7 +214,7 @@ public class Climber extends SubsystemBase{
         SmartDashboard.putNumber("lywhell Vellovity", summonPosition());
         SmartDashboard.putNumber("Climb Position", climbMotorEncoder.getPosition());
         // SmartDashboard.putBoolean("Ratchet Locked?", true);
-        ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true));
+        SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));
     }
 
 
