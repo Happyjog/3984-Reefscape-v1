@@ -107,8 +107,8 @@ public final class Constants {
         public static final int ratchetServoID = 0;
         public static final int trapServoID = 1;
         /* DIO PORTS */
-        public static final int limitSwitch1ID = 0;
-        public static final int limitSwitch2ID = 1;
+        public static final int limitSwitch1ID = 4;
+        public static final int limitSwitch2ID = 5;
         public static final int throBoreAbsoluteChannel = 0;
         public static final int throBoreRelativeChannel1 = 1;
         public static final int throBoreRelativeChannel2 = 2;
@@ -205,7 +205,7 @@ public final class Constants {
                         
             public static final class elevatorOuttake{
                 public static final int outtakeMotorID = 5;
-                public static final int outtakeMotorWSID = 23;
+                public static final int outtakeMotorWSID = 8;
             }
             
         }

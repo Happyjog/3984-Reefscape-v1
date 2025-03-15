@@ -23,3 +23,7 @@ public final class Main {
     RobotBase.startRobot(Robot::new);
   }
 }
+
+
+
+// magnetic limit switches are in port 5 and 4

@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
+
+import java.util.function.BooleanSupplier;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -30,7 +33,6 @@ public class Elevator extends SubsystemBase{
     private SparkMax elevatorMotorWS;
     private SparkMax outtakeMotor;
     private SparkMax outtakeMotorWS;
-    private PWM ratchetServo;
     private PWM trapServo;
     private DigitalInput limitSwitch1;
     private DigitalInput limitSwitch2;
@@ -40,7 +42,6 @@ public class Elevator extends SubsystemBase{
     private SparkClosedLoopController elevatorMotorWSPID;
 
     public Elevator(){
-        ratchetServo = new PWM(Constants.Swerve.ratchetServoID);
         trapServo = new PWM(Constants.Swerve.trapServoID);
         limitSwitch1 = new DigitalInput(Constants.Swerve.limitSwitch1ID);
         limitSwitch2 = new DigitalInput(Constants.Swerve.limitSwitch2ID);        
@@ -50,18 +51,18 @@ public class Elevator extends SubsystemBase{
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
-        elevatorMotorConfig.idleMode(IdleMode.kCoast).inverted(false);
+        elevatorMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
         elevatorMotorConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
         //TODO elevatorMotorConfig.encoder.velocityConversionFactor(())
         elevatorMotor.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         //positive power percentage is elevator down
         elevatorMotorWS = new SparkMax(
-            Constants.Swerve.elevator.elevatorShaft.shaftMotorID,
+            Constants.Swerve.elevator.elevatorShaft.shaftMotorWSID,
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorWSConfig = new SparkMaxConfig();
-        elevatorMotorWSConfig.idleMode(IdleMode.kCoast).inverted(true);
+        elevatorMotorWSConfig.idleMode(IdleMode.kBrake).inverted(true);
         elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
         //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -72,7 +73,13 @@ public class Elevator extends SubsystemBase{
             MotorType.kBrushed
         );
         SparkMaxConfig outtakeMotorConfig = new SparkMaxConfig();
-        elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1,Constants.Swerve.throBoreAbsoluteChannel);//elevatorMotor.getEncoder();
+
+        outtakeMotorWS = new SparkMax(
+            Constants.Swerve.elevator.elevatorOuttake.outtakeMotorWSID,
+            MotorType.kBrushed
+        );
+        SparkMaxConfig outtakeMotorConfigWS = new SparkMaxConfig();
+        elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1,Constants.Swerve.throBoreRelativeChannel2);//elevatorMotor.getEncoder();
 
         // Set the position to zero
         elevatorMotorEncoder.reset();
@@ -124,11 +131,68 @@ public class Elevator extends SubsystemBase{
         ).andThen((intake)? In(): Stop())*/
         );
     }
-    public void periodic(){
-        if (limitSwitch1.get() && limitSwitch2.get()){
-            reset();
-        }
 
-        SmartDashboard.putNumber("IntakePos", getPos().getDegrees());
+
+ // Manual Controls:
+ public void ShaftUp(){
+    elevatorMotorWS.set(.5);
+    elevatorMotor.set(.5);
+}
+public void ShaftDown(){
+    elevatorMotor.set(.5);
+    elevatorMotorWS.set(.5);
+}
+public void ShaftStopManual(){
+    elevatorMotor.stopMotor();
+    elevatorMotorWS.stopMotor();
+}
+public Command manualShaftControl(BooleanSupplier up, BooleanSupplier down){
+    return run(()->{
+        if (up.getAsBoolean()){
+           ShaftUp(); 
+           System.out.print("going up");
+        }
+        else if (down.getAsBoolean()){
+            ShaftDown();
+        }
+        else{
+            ShaftStopManual();
+        }
+    });
+
+}
+public void OuttakeOut(){
+    outtakeMotorWS.set(-.5);
+    outtakeMotor.set(-.5);
+}
+public void OuttakeIn(){
+    outtakeMotor.set(.5);
+    outtakeMotorWS.set(.5);
+}
+public void OuttakeStopManual(){
+    outtakeMotor.stopMotor();
+    outtakeMotorWS.stopMotor();
+}
+public Command manualOuttakeControl(BooleanSupplier up, BooleanSupplier down){
+    return run(()->{
+        if (up.getAsBoolean()){
+           OuttakeIn();
+        }
+        else if (down.getAsBoolean()){
+            OuttakeOut();
+        }
+        else{
+            OuttakeStopManual();
+        }
+    });
+
+}
+
+public void periodic(){
+    if (limitSwitch1.get() && limitSwitch2.get()){
+        reset();
     }
+
+    SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
+}
 }

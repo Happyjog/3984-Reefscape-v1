@@ -17,12 +17,14 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.moveToNearestApriltagCommand;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Flywheel;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Climber;
 import frc.robot.Constants.Swerve.flywheel;
 
 /**
@@ -59,6 +61,8 @@ public class RobotContainer {
   // private final PhotonCamera cam2 = new PhotonCamera("Microsoft_LifeCam_HD-3000");
   //private final SendableChooser<Command> autoChooser;
   private final Swerve s_Swerve = new Swerve();
+  private final Elevator s_Elevator = new Elevator();
+  private final Climber s_Climber = new Climber();
   // private final Intake intake = new Intake();  
   //private final aimAtTarget aimCommand = new aimAtTarget(cam, s_Swerve, s_Swerve::getPose);
   // private final moveToNearestApriltagCommand translateApriltag = new moveToNearestApriltagCommand(s_Swerve, s_Swerve::getPose, 0);
@@ -83,7 +87,20 @@ public class RobotContainer {
         ()->false,//() -> robotCentric.getAsBoolean(),
         () -> driver.leftBumper().getAsBoolean(),
         () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
-    // intake.setDefaultCommand(
+      // s_Elevator.setDefaultCommand(
+      //   // s_Elevator.manualShaftControl(
+      //   //   ()-> driver.leftBumper().getAsBoolean(), 
+      //   //   ()-> driver.rightBumper().getAsBoolean())
+      //     // s_Elevator.manualOuttakeControl(
+      //     //   ()-> driver.leftBumper().getAsBoolean(), 
+      //     //   ()-> driver.rightBumper().getAsBoolean())
+      // );
+      s_Climber.setDefaultCommand(
+        s_Climber.manualControl(
+          ()-> driver.leftBumper().getAsBoolean(), 
+          ()-> driver.rightBumper().getAsBoolean())
+      );
+        // intake.setDefaultCommand(
     //   intake.Stop()
     //   //intake.moveTo(Constants.Swerve.intake.IDLE, false)
     // );
@@ -111,6 +128,7 @@ public class RobotContainer {
     //aim.whileTrue(aimCommand);
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
+    // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
     // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1, s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
     // driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
