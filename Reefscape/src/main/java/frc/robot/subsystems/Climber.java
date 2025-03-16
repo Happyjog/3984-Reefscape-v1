@@ -29,10 +29,12 @@ public class Climber extends SubsystemBase{
     private SparkMax climbMotor;
     private RelativeEncoder climbMotorEncoder;
     private SparkClosedLoopController climbMotorPID;
+    private PWM trapServo;
     private PWM ratchetServo;
     public Climber() {
         // initialies all the variables and constants
         climbMotor = new SparkMax(frc.robot.Constants.Swerve.climber.rotMotorID, MotorType.kBrushless );
+        trapServo = new PWM(Constants.Swerve.trapServoID);
         ratchetServo = new PWM(Constants.Swerve.ratchetServoID);
         SparkMaxConfig climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
@@ -184,8 +186,8 @@ public class Climber extends SubsystemBase{
             }))
         );
     }
-
-     // Manual Controls:
+    
+    // Manual Controls:
      public void Down(){
         climbMotor.set(-.5);
     }

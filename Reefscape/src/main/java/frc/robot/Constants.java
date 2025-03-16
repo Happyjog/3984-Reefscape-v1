@@ -190,18 +190,31 @@ public final class Constants {
         }
 
         public static final class elevator {
+            // TODO Set elevator constants 
 
             public static final class elevatorShaft {
                 public static final int shaftMotorID = 7;
                 public static final int shaftMotorWSID = 16;
-                public static final double tolerance = 1.0;
-                public static final double kP = 0.01;
-                public static final double kI = 0;
-                public static final double kD = 0;
-                public static final double gearRatio = 25;
-                public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
-                        Rotation2d.fromDegrees(2022) };
-                }
+                public static final int laserCan1ID = -1; //TODO
+                public static final int laserCan2ID = -1; //TODO
+                public static final double kP = 0.01; // TODO
+                public static final double kI = 0; // TODO
+                public static final double kD = 0; // TODO
+                public static final double kS = 0; // TODO
+                public static final double kG = 0; // TODO
+                public static final double kV = 0; // TODO
+                public static final double kA = 0; // TODO
+                public static final double kMaxVelocity = 0; // TODO
+                public static final double kMaxAcceleration = 0; // TODO
+                public static final double kElevatorMotorRampRate = 0.1; 
+                public static final double kErrorTolerance = 100;
+                public static final double kFULLEXTENSION = -2022; // TODO
+                public static final double kLEVEL1 = 0; 
+                public static final double kLEVEL2 = 0;
+                public static final double kLEVEL3 = 0;
+                public static final double kLEVEL4 = 0;
+
+            }
             
         }
 

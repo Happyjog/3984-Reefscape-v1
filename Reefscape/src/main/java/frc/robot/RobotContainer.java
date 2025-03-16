@@ -36,7 +36,6 @@ import frc.robot.Constants.Swerve.flywheel;
  */
 public class RobotContainer {
   // The robot's subsystems and commands
-  //private final Joystick driver = new Joystick(1);
   private final CommandXboxController driver = new CommandXboxController(1);
   //private final CommandXboxController second = new CommandXboxController(0);
   //private final int translationAxis = XboxController.Axis.kLeftY.value;

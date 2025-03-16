@@ -4,26 +4,26 @@ import com.revrobotics.spark.SparkMax;
 
 import java.util.function.BooleanSupplier;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import au.grapplerobotics.LaserCan;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PWM;
 
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.lib.math.MathUtils;
 
 
 
@@ -32,18 +32,22 @@ public class Elevator extends SubsystemBase{
     private SparkMax elevatorMotor;
     private SparkMax elevatorMotorWS;
     
-    private PWM trapServo;
     private DigitalInput limitSwitch1;
     private DigitalInput limitSwitch2;
+    private LaserCan laser1;
+    private LaserCan laser2;
     private Encoder elevatorMotorEncoder;
     // private RelativeEncoder elevatorMotorEncoder;
-    private SparkClosedLoopController elevatorMotorPID;
-    private SparkClosedLoopController elevatorMotorWSPID;
+    // private SparkClosedLoopController elevatorMotorPID;
+    // private SparkClosedLoopController elevatorMotorWSPID;
+    private PIDController elevatorMotorPID;
+    private ProfiledPIDController elevatorMotorProfiledPID;
+    private ElevatorFeedforward elevatorFeedforward;
 
     public Elevator(){
-        trapServo = new PWM(Constants.Swerve.trapServoID);
         limitSwitch1 = new DigitalInput(Constants.Swerve.limitSwitch1ID);
-        limitSwitch2 = new DigitalInput(Constants.Swerve.limitSwitch2ID);        
+        limitSwitch2 = new DigitalInput(Constants.Swerve.limitSwitch2ID);   
+        laser1 = new LaserCan(0);     
         //positive power percentage is elevator up
         elevatorMotor = new SparkMax(
             Constants.Swerve.elevator.elevatorShaft.shaftMotorID,
@@ -52,9 +56,9 @@ public class Elevator extends SubsystemBase{
         SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
         elevatorMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
         elevatorMotorConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
-        //TODO elevatorMotorConfig.encoder.velocityConversionFactor(())
+        elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Swerve.elevator.elevatorShaft.kElevatorMotorRampRate);
         elevatorMotor.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+        
         //positive power percentage is elevator down
         elevatorMotorWS = new SparkMax(
             Constants.Swerve.elevator.elevatorShaft.shaftMotorWSID,
@@ -63,98 +67,128 @@ public class Elevator extends SubsystemBase{
         SparkMaxConfig elevatorMotorWSConfig = new SparkMaxConfig();
         elevatorMotorWSConfig.idleMode(IdleMode.kBrake).inverted(false);
         elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
-        //TODO elevatorMotorWSConfig.encoder.velocityConversionFactor(())
+        elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Swerve.elevator.elevatorShaft.kElevatorMotorRampRate);
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1, Constants.Swerve.throBoreRelativeChannel2);
-
+        elevatorMotorPID = new PIDController(
+            Constants.Swerve.elevator.elevatorShaft.kP, 
+            Constants.Swerve.elevator.elevatorShaft.kI, 
+            Constants.Swerve.elevator.elevatorShaft.kD);
+        elevatorMotorProfiledPID  = new ProfiledPIDController(
+            Constants.Swerve.elevator.elevatorShaft.kP, 
+            Constants.Swerve.elevator.elevatorShaft.kI, 
+            Constants.Swerve.elevator.elevatorShaft.kD, 
+            new TrapezoidProfile.Constraints(
+                Constants.Swerve.elevator.elevatorShaft.kMaxVelocity, 
+                Constants.Swerve.elevator.elevatorShaft.kMaxAcceleration));
+        elevatorFeedforward = new ElevatorFeedforward(
+            Constants.Swerve.elevator.elevatorShaft.kS, 
+            Constants.Swerve.elevator.elevatorShaft.kG, 
+            Constants.Swerve.elevator.elevatorShaft.kV, 
+            Constants.Swerve.elevator.elevatorShaft.kA);
+        
         // Set the position to zero
         elevatorMotorEncoder.reset();
     }
-    public void reset(){
-        elevatorMotorEncoder.reset();
+
+
+    // // Run PID
+    // public void GoTo(Rotation2d goal){
+    //     elevatorMotorPID.setReference(
+    //         goal.getDegrees(), 
+    //         ControlType.kPosition, ClosedLoopSlot.kSlot0
+    //     );
+        
+    // }
+    // // Convert PID method into a runable command
+    // // if button is pressed, go down to goal, until within setpoint or when button stopped pressing, when button at setpoint, start intake and go until 
+    // public Command moveTo(Rotation2d goal, boolean intake){
+        
+    //     //Rotation2d[] a = new Rotation2d[]{Rotation2d.fromDegrees(Sangle)/*(49.26)/*getAngles(x, y)[0]*/, Rotation2d.fromDegrees(Jangle)};/*(61.97)};// getAngles(x, y)[1]};*/
+    //     return runOnce(()->{
+    //         SmartDashboard.putNumber("Goal", goal.getDegrees());
+           
+    //     }).andThen(run(
+    //         () -> GoTo(goal)
+    //     ).withTimeout(1)/*until(
+    //         ()->(
+    //             Math.abs(getErrors(goal).getDegrees()) < Constants.Swerve.intake.tolerance 
+    //             && Math.abs(getErrors(goal).getDegrees()) < Constants.Swerve.intake.tolerance
+    //         )
+    //     ).andThen((intake)? In(): Stop())*/
+    //     );
+    // }
+
+
+    // Unprofiled PID Control
+    public void reachGoalNoProfile(double goal){
+        double voltageOutput = MathUtils.clamp(elevatorMotorPID.calculate(getPos().getDegrees(), goal), 7, -7);
+        elevatorMotor.setVoltage(-voltageOutput);
+        elevatorMotorWS.setVoltage(voltageOutput);
     }
-    
-   
-    public Command Stop(){
-        return run(()->{
-            elevatorMotor.set(0);
-            elevatorMotorWS.set(0);
-        });
+    // Profiled PID Control + ff
+    public void reachGoal(double goal){
+        double voltageOutput = MathUtils.clamp(elevatorFeedforward.calculateWithVelocities(getVelocity(), elevatorMotorProfiledPID.getSetpoint().velocity)
+            + elevatorMotorProfiledPID.calculate(getPos().getDegrees(), goal), 7, -7); 
+        elevatorMotor.setVoltage(-voltageOutput);
+        elevatorMotorWS.setVoltage(voltageOutput);
+    }
+    //PID Runner
+    public Command setHeight(double goal){
+        return run(()->{reachGoalNoProfile(goal);}).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Swerve.elevator.elevatorShaft.kErrorTolerance);
     }
 
+
+    // Manual Controls:
+    public void ShaftUp(){
+        elevatorMotorWS.set(-.05);
+        elevatorMotor.set(.05);
+    }
+    public void ShaftDown(){
+        elevatorMotor.set(-.05);
+        elevatorMotorWS.set(.05);
+    }
+    public void ShaftStopManual(){
+        elevatorMotor.stopMotor();
+        elevatorMotorWS.stopMotor();
+    }
+    public Command manualShaftControl(BooleanSupplier up, BooleanSupplier down){
+        return run(()->{
+            if (up.getAsBoolean()){
+            ShaftUp(); 
+            System.out.print("going up");
+            }
+            else if (down.getAsBoolean()){
+                ShaftDown();
+            }
+            else{
+                ShaftStopManual();
+            }
+        });
+    }
+    // Get and Reset methods:
     public Rotation2d getPos(){
         Rotation2d posElevatorMotor = Rotation2d.fromDegrees(elevatorMotorEncoder.get()); 
         return posElevatorMotor;
+    }
+    public void resetPos(){
+        elevatorMotorEncoder.reset();
+    }
+    public double getVelocity(){
+        return elevatorMotorEncoder.getRate();
     }
     public Rotation2d getErrors(Rotation2d goal){
         Rotation2d currPos =getPos();
         double error = currPos.getDegrees() - goal.getDegrees();
         return Rotation2d.fromDegrees(error);
     }
-    // Run PID
-    public void GoTo(Rotation2d goal){
-        elevatorMotorPID.setReference(
-            goal.getDegrees(), 
-            ControlType.kPosition, ClosedLoopSlot.kSlot0
-        );
-        
-    }
-    // Convert PID method into a runable command
-    // if button is pressed, go down to goal, until within setpoint or when button stopped pressing, when button at setpoint, start intake and go until 
-    public Command moveTo(Rotation2d goal, boolean intake){
-        
-        //Rotation2d[] a = new Rotation2d[]{Rotation2d.fromDegrees(Sangle)/*(49.26)/*getAngles(x, y)[0]*/, Rotation2d.fromDegrees(Jangle)};/*(61.97)};// getAngles(x, y)[1]};*/
-        return runOnce(()->{
-            SmartDashboard.putNumber("Goal", goal.getDegrees());
-           
-        }).andThen(run(
-            () -> GoTo(goal)
-        ).withTimeout(1)/*until(
-            ()->(
-                Math.abs(getErrors(goal).getDegrees()) < Constants.Swerve.intake.tolerance 
-                && Math.abs(getErrors(goal).getDegrees()) < Constants.Swerve.intake.tolerance
-            )
-        ).andThen((intake)? In(): Stop())*/
-        );
-    }
 
-
- // Manual Controls:
- public void ShaftUp(){
-    elevatorMotorWS.set(-.05);
-    elevatorMotor.set(.05);
-}
-public void ShaftDown(){
-    elevatorMotor.set(-.05);
-    elevatorMotorWS.set(.05);
-}
-public void ShaftStopManual(){
-    elevatorMotor.stopMotor();
-    elevatorMotorWS.stopMotor();
-}
-public Command manualShaftControl(BooleanSupplier up, BooleanSupplier down){
-    return run(()->{
-        if (up.getAsBoolean()){
-           ShaftUp(); 
-           System.out.print("going up");
+    // Periodic
+    public void periodic(){
+        // If elevator has reached bottom, reset to 0 to avoid drift and stuff.
+        if (!limitSwitch1.get() && !limitSwitch2.get()){
+            resetPos();
         }
-        else if (down.getAsBoolean()){
-            ShaftDown();
-        }
-        else{
-            ShaftStopManual();
-        }
-    });
-
-}
-
-
-public void periodic(){
-    if (!limitSwitch1.get() && !limitSwitch2.get()){
-        System.out.println("TUREUUEIRUENRIUEWNR");
-        reset();
+        SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
     }
-
-    SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
-}
 }
