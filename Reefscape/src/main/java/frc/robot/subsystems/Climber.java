@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 
 
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -15,12 +14,10 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -31,26 +28,19 @@ public class Climber extends SubsystemBase{
     private SparkClosedLoopController climbMotorPID;
     private PWM trapServo;
     private PWM ratchetServo;
+    private boolean climbMotorDirection;
     public Climber() {
         // initialies all the variables and constants
-        climbMotor = new SparkMax(frc.robot.Constants.Swerve.climber.rotMotorID, MotorType.kBrushless );
+        climbMotor = new SparkMax(frc.robot.Constants.Climber.rotMotorID, MotorType.kBrushless );
         trapServo = new PWM(Constants.Swerve.trapServoID);
         ratchetServo = new PWM(Constants.Swerve.ratchetServoID);
         SparkMaxConfig climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
-        climbMotorConfig.closedLoop.pid(Constants.Swerve.flywheel.FWtop.kP, Constants.Swerve.flywheel.FWtop.kI, Constants.Swerve.flywheel.FWtop.kD);
+        climbMotorConfig.closedLoop.pid(Constants.Climber.kP, Constants.Climber.kI, Constants.Climber.kD);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-
-       
         climbMotorEncoder = climbMotor.getEncoder();
         climbMotorEncoder.setPosition(0);
-
-
-       
         climbMotorPID = climbMotor.getClosedLoopController();
-
-
     }
 
 
@@ -122,7 +112,7 @@ public class Climber extends SubsystemBase{
             () -> GoTo(goal)
         ).until(
             ()->(
-                Math.abs(getError(goal).getDegrees()) < Constants.Swerve.climber.tolerance
+                Math.abs(getError(goal).getDegrees()) < Constants.Climber.tolerance
             ))
         );
     }
@@ -162,7 +152,7 @@ public class Climber extends SubsystemBase{
             () -> {GoTo((new Rotation2d(climbMotorEncoder.getPosition() + p)));}
         ).until(
             ()->(
-                (Math.abs(getError(Rotation2d.fromDegrees(p)).getDegrees()) < Constants.Swerve.climber.tolerance)
+                (Math.abs(getError(Rotation2d.fromDegrees(p)).getDegrees()) < Constants.Climber.tolerance)
             )).andThen(runOnce(()->{
                 if (idleState){
                     atSetpoint = false;
@@ -175,7 +165,7 @@ public class Climber extends SubsystemBase{
                 System.out.println(getPosition);
             })).until(
                 () -> (
-                    Math.abs(this.getError(Rotation2d.fromDegrees(climbMotorEncoder.getPosition())).getDegrees()) < Constants.Swerve.flywheel.tolerance
+                    Math.abs(this.getError(Rotation2d.fromDegrees(climbMotorEncoder.getPosition())).getDegrees()) < Constants.Climber.tolerance
                 )
             ).andThen(runOnce(() -> {
                 if (idleState) {
@@ -190,9 +180,11 @@ public class Climber extends SubsystemBase{
     // Manual Controls:
      public void Down(){
         climbMotor.set(-.5);
+        climbMotorDirection = false;
     }
     public void Up(){
         climbMotor.set(.5);
+        climbMotorDirection = true;
     }
     public void Stop(){
         climbMotor.stopMotor();
@@ -215,7 +207,12 @@ public class Climber extends SubsystemBase{
 
     
     public void periodic(){
-
+        if (climbMotorDirection){
+            ratchetServo.setPosition(0);
+        }
+        else{
+            ratchetServo.setPosition(1);
+        }
         SmartDashboard.putBoolean("Ready To Shoot?", atSetpoint);
         SmartDashboard.putNumber("lywhell Vellovity", summonPosition());
         SmartDashboard.putNumber("Climb Position", climbMotorEncoder.getPosition());

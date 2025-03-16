@@ -34,8 +34,7 @@ public class Elevator extends SubsystemBase{
     
     private DigitalInput limitSwitch1;
     private DigitalInput limitSwitch2;
-    private LaserCan laser1;
-    private LaserCan laser2;
+    
     private Encoder elevatorMotorEncoder;
     // private RelativeEncoder elevatorMotorEncoder;
     // private SparkClosedLoopController elevatorMotorPID;
@@ -47,45 +46,45 @@ public class Elevator extends SubsystemBase{
     public Elevator(){
         limitSwitch1 = new DigitalInput(Constants.Swerve.limitSwitch1ID);
         limitSwitch2 = new DigitalInput(Constants.Swerve.limitSwitch2ID);   
-        laser1 = new LaserCan(0);     
+        
         //positive power percentage is elevator up
         elevatorMotor = new SparkMax(
-            Constants.Swerve.elevator.elevatorShaft.shaftMotorID,
+            Constants.Elevator.elevatorShaft.shaftMotorID,
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorConfig = new SparkMaxConfig();
         elevatorMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
-        elevatorMotorConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
-        elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Swerve.elevator.elevatorShaft.kElevatorMotorRampRate);
+        elevatorMotorConfig.closedLoop.pid(Constants.Elevator.elevatorShaft.kP, Constants.Elevator.elevatorShaft.kI, Constants.Elevator.elevatorShaft.kD);
+        elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Elevator.elevatorShaft.kElevatorMotorRampRate);
         elevatorMotor.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         
         //positive power percentage is elevator down
         elevatorMotorWS = new SparkMax(
-            Constants.Swerve.elevator.elevatorShaft.shaftMotorWSID,
+            Constants.Elevator.elevatorShaft.shaftMotorWSID,
             MotorType.kBrushless
         );
         SparkMaxConfig elevatorMotorWSConfig = new SparkMaxConfig();
         elevatorMotorWSConfig.idleMode(IdleMode.kBrake).inverted(false);
-        elevatorMotorWSConfig.closedLoop.pid(Constants.Swerve.elevator.elevatorShaft.kP, Constants.Swerve.elevator.elevatorShaft.kI, Constants.Swerve.elevator.elevatorShaft.kD);
-        elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Swerve.elevator.elevatorShaft.kElevatorMotorRampRate);
+        elevatorMotorWSConfig.closedLoop.pid(Constants.Elevator.elevatorShaft.kP, Constants.Elevator.elevatorShaft.kI, Constants.Elevator.elevatorShaft.kD);
+        elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Elevator.elevatorShaft.kElevatorMotorRampRate);
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1, Constants.Swerve.throBoreRelativeChannel2);
         elevatorMotorPID = new PIDController(
-            Constants.Swerve.elevator.elevatorShaft.kP, 
-            Constants.Swerve.elevator.elevatorShaft.kI, 
-            Constants.Swerve.elevator.elevatorShaft.kD);
+            Constants.Elevator.elevatorShaft.kP, 
+            Constants.Elevator.elevatorShaft.kI, 
+            Constants.Elevator.elevatorShaft.kD);
         elevatorMotorProfiledPID  = new ProfiledPIDController(
-            Constants.Swerve.elevator.elevatorShaft.kP, 
-            Constants.Swerve.elevator.elevatorShaft.kI, 
-            Constants.Swerve.elevator.elevatorShaft.kD, 
+            Constants.Elevator.elevatorShaft.kP, 
+            Constants.Elevator.elevatorShaft.kI, 
+            Constants.Elevator.elevatorShaft.kD, 
             new TrapezoidProfile.Constraints(
-                Constants.Swerve.elevator.elevatorShaft.kMaxVelocity, 
-                Constants.Swerve.elevator.elevatorShaft.kMaxAcceleration));
+                Constants.Elevator.elevatorShaft.kMaxVelocity, 
+                Constants.Elevator.elevatorShaft.kMaxAcceleration));
         elevatorFeedforward = new ElevatorFeedforward(
-            Constants.Swerve.elevator.elevatorShaft.kS, 
-            Constants.Swerve.elevator.elevatorShaft.kG, 
-            Constants.Swerve.elevator.elevatorShaft.kV, 
-            Constants.Swerve.elevator.elevatorShaft.kA);
+            Constants.Elevator.elevatorShaft.kS, 
+            Constants.Elevator.elevatorShaft.kG, 
+            Constants.Elevator.elevatorShaft.kV, 
+            Constants.Elevator.elevatorShaft.kA);
         
         // Set the position to zero
         elevatorMotorEncoder.reset();
@@ -135,7 +134,7 @@ public class Elevator extends SubsystemBase{
     }
     //PID Runner
     public Command setHeight(double goal){
-        return run(()->{reachGoalNoProfile(goal);}).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Swerve.elevator.elevatorShaft.kErrorTolerance);
+        return run(()->{reachGoalNoProfile(goal);}).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance);
     }
 
 

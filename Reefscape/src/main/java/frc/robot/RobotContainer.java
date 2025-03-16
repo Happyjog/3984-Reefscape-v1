@@ -6,6 +6,9 @@ package frc.robot;
 
 
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 
 // import com.pathplanner.lib.auto.AutoBuilder;
@@ -15,19 +18,22 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.WaitForCoralCommand;
 import frc.robot.commands.moveToNearestApriltagCommand;
+import frc.robot.commands.moveToOffset;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Flywheel;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Spitter;
-import frc.robot.Constants.Swerve.flywheel;
-
+import frc.robot.Constants.Elevator.elevatorShaft;
+import frc.robot.commands.WaitForCoralCommand;
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -59,66 +65,60 @@ public class RobotContainer {
   // private final Flywheel fwheel = new Flywheel();
   // private final PhotonCamera cam = new PhotonCamera("Global_Shutter_Camera");
   // private final PhotonCamera cam2 = new PhotonCamera("Microsoft_LifeCam_HD-3000");
-  //private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
   private final Swerve s_Swerve = new Swerve();
   private final Elevator s_Elevator = new Elevator();
   private final Climber s_Climber = new Climber();
   private final Spitter s_Spitter = new Spitter();
-  // private final Intake intake = new Intake();  
-  //private final aimAtTarget aimCommand = new aimAtTarget(cam, s_Swerve, s_Swerve::getPose);
-  // private final moveToNearestApriltagCommand translateApriltag = new moveToNearestApriltagCommand(s_Swerve, s_Swerve::getPose, 0);
-    /* The container for the robot. subsystems, OI devices, and commands. */
+
+  // TODO Add offsets
+  private final moveToOffset moveL = new moveToOffset(s_Swerve, s_Swerve::getPose);
+  private final moveToOffset moveR = new moveToOffset(s_Swerve, s_Swerve::getPose);
+
+  /* The container for the robot. subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // NamedCommands.registerCommand("Launch", intake.Out().withTimeout(0.2));
-    // NamedCommands.registerCommand("StartIntake", intake.In().withTimeout(0.00001));
-    // NamedCommands.registerCommand("IntakeDown", intake.moveTo(Constants.Swerve.intake.INTAKE, true));
-    // NamedCommands.registerCommand("StopIntake", intake.Stop().withTimeout(0.00001)); 
-    // NamedCommands.registerCommand("IntakeUp", intake.moveTo(Constants.Swerve.intake.IDLE, false));
-    // NamedCommands.registerCommand("SpinUp", fwheel.moveTill(flywheel.SPEAKER, flywheel.SPEAKER, false).withTimeout(5));//fwheel.moveTo(0, 0, note, null, note));
-    // NamedCommands.registerCommand("StopFlywheel", fwheel.stop().withTimeout(0.00001));
-    // autoChooser = AutoBuilder.buildAutoChooser();
+    // Pathplanner commands
+    NamedCommands.registerCommand("WaitForCoral", new WaitForCoralCommand());
+
+    NamedCommands.registerCommand("ScoreL4", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
+    NamedCommands.registerCommand("ScoreL3", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
+    NamedCommands.registerCommand("ScoreL2", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
+    NamedCommands.registerCommand("ScoreL1", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
+
+    NamedCommands.registerCommand("ScoreR4", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
+    NamedCommands.registerCommand("ScoreR3", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
+    NamedCommands.registerCommand("ScoreR2", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
+    NamedCommands.registerCommand("ScoreR1", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
+
+    autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
-    // SmartDashboard.putData("AutoChooser", autoChooser);
+    SmartDashboard.putData("AutoChooser", autoChooser);
     s_Swerve.setDefaultCommand(
       new TeleopSwerve(
         s_Swerve,
-        () -> -driver.getLeftY(),//-driver.getRwAxis(translationAxis),
-        () -> driver.getLeftX(),//-driver.getRawAxis(strafeAxis),
-        () -> -driver.getRightX(),//-driver.getRawAxis(rotationAxis),
-        ()->false,//() -> robotCentric.getAsBoolean(),
+        () -> -driver.getLeftY(),
+        () -> driver.getLeftX(),
+        () -> -driver.getRightX(),
+        ()->false,
         () -> driver.leftBumper().getAsBoolean(),
-        () -> driver.x().getAsBoolean()));//slow.getAsBoolean()));
+        () -> driver.x().getAsBoolean()));
+      // TODO Remove manual control later
       s_Elevator.setDefaultCommand(
         s_Elevator.manualShaftControl(
           ()-> driver.leftBumper().getAsBoolean(), 
           ()-> driver.rightBumper().getAsBoolean())
-      );
-      s_Spitter.setDefaultCommand(
-        s_Spitter.manualOuttakeControl(
-          ()-> driver.a().getAsBoolean(), 
-          ()->driver.b().getAsBoolean())
       );
       // s_Climber.setDefaultCommand(
       //   s_Climber.manualControl(
       //     ()-> driver.leftBumper().getAsBoolean(), 
       //     ()-> driver.rightBumper().getAsBoolean())
       // );
-        // intake.setDefaultCommand(
-    //   intake.Stop()
-    //   //intake.moveTo(Constants.Swerve.intake.IDLE, false)
-    // );
-    // fwheel.setDefaultCommand(
-    //   fwheel.stop()
-      /*fwheel.moveTo(
-        ()->amp.getAsBoolean(), 
-        ()->speaker.getAsBoolean(), 
-        ()-> driver.getRawAxis(triggerLAxis))*/
+
     // Configure the button bindings
     configureButtonBindings();
     
   } 
 
-  //robotCentric.get();
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
@@ -128,8 +128,8 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
-
+    driver.x().onTrue(new InstantCommand(() -> s_Swerve.setAbsolute()));
+    driver.a().onTrue(new InstantCommand(() -> s_Spitter.OuttakeOut()));
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
     // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1, s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
@@ -149,7 +149,9 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  //public Command getAutonomousCommand(){return autoChooser.getSelected();}
+  public Command getAutonomousCommand(){
+    return autoChooser.getSelected();
+  }
   // public Command testPath(){return new PathPlannerAuto("testAuto");}
   // // Left side autos
   // public Command Left1Note(){return new PathPlannerAuto("Left1Note");}

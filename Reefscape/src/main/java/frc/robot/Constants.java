@@ -159,117 +159,101 @@ public final class Constants {
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID,
                     canCoderID, angleOffset);
         }
+    }
+    public static final class Flywheel {
+        public static final double FWDiameter = 4.0; // Inches NEED TO CONVERT
+        public static final double tolerance = 1; // Meters per second // changed from 1 to 0.25 - bentley 11/13/24
 
-
-        public static final class flywheel {
-            public static final double FWDiameter = 4.0; // Inches NEED TO CONVERT
-            public static final double tolerance = 1; // Meters per second // changed from 1 to 0.25 - bentley 11/13/24
-
-            public static final class FWtop {// TODO PID
-                public static final int FWid = 18;
-                public static final double kP = 0.1;// 0.1;
-                public static final double kI = 0;
-                public static final double kD = 0;
-                public static final double kV = 0.01;
-                public static final double gearRatio = 1;
-            }
-
-            public static final class FWbott { // TODO PID
-                public static final int FWid = 19;
-                public static final double kP = 0.1;// 0.1;
-                public static final double kI = 0;
-                public static final double kD = 0;
-                public static final double kV = 0.01;
-                public static final double gearRatio = 1;
-            }
-
-            // AMP and SPEAKER velocity presets
-            public static final double AMP = 10;
-            public static final double SPEAKER = 15;// 15; // changed from 50 to 15 - bentley 11/13/24
-
-        }
-
-        public static final class elevator {
-            // TODO Set elevator constants 
-
-            public static final class elevatorShaft {
-                public static final int shaftMotorID = 7;
-                public static final int shaftMotorWSID = 16;
-                public static final int laserCan1ID = -1; //TODO
-                public static final int laserCan2ID = -1; //TODO
-                public static final double kP = 0.01; // TODO
-                public static final double kI = 0; // TODO
-                public static final double kD = 0; // TODO
-                public static final double kS = 0; // TODO
-                public static final double kG = 0; // TODO
-                public static final double kV = 0; // TODO
-                public static final double kA = 0; // TODO
-                public static final double kMaxVelocity = 0; // TODO
-                public static final double kMaxAcceleration = 0; // TODO
-                public static final double kElevatorMotorRampRate = 0.1; 
-                public static final double kErrorTolerance = 100;
-                public static final double kFULLEXTENSION = -2022; // TODO
-                public static final double kLEVEL1 = 0; 
-                public static final double kLEVEL2 = 0;
-                public static final double kLEVEL3 = 0;
-                public static final double kLEVEL4 = 0;
-
-            }
-            
-        }
-
-        public static final class Outtake{
-            public static final int outtakeMotorID = 5;
-            public static final int outtakeMotorWSID = 8;
-        }
-
-        public static final class climber {
-            public static final int rotMotorID = 9; // climber left
-            public static final double tolerance = 1.0;
-            public static final double kP = 0.01;
+        public static final class FWtop {// TODO PID
+            public static final int FWid = 18;
+            public static final double kP = 0.1;// 0.1;
             public static final double kI = 0;
             public static final double kD = 0;
-            public static final double gearRatio = 25;
-            public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
-                    Rotation2d.fromDegrees(2022) };
+            public static final double kV = 0.01;
+            public static final double gearRatio = 1;
         }
 
-        public static final class intake {
-            public static final double tolerance = 0.1;
-
-            public static final class intakeArm {
-                public static final int rotMotorID = 12; // TODO
-                public static final double kP = 0.005;
-                public static final double kI = 0;
-                public static final double kD = 0.0001;
-                public static final double gearRatio = 100;
-
-            }
-
-            public static final class intakeMotor {
-                public static final int IDR = 0;
-                public static final int IDL = 1;
-
-            }
-
-            public static final Rotation2d INTAKE = Rotation2d.fromDegrees(-200);
-            public static final Rotation2d AMPSHOT = Rotation2d.fromDegrees(-94 + 10 + 5);
-            public static final Rotation2d IDLE = Rotation2d.fromDegrees(0);
-
+        public static final class FWbott { // TODO PID
+            public static final int FWid = 19;
+            public static final double kP = 0.1;// 0.1;
+            public static final double kI = 0;
+            public static final double kD = 0;
+            public static final double kV = 0.01;
+            public static final double gearRatio = 1;
         }
 
-        public static final class camera {
-            public static final double Height = 0;
-            // public static final double TargetHeight = 0;
-            public static final double CameraPitch = 0;
-            public static final Rotation3d camAngle = new Rotation3d(0, 0, 0/* 1.571 */);
-            public static final Transform3d CAMERA_TO_ROBOT = new Transform3d(new Translation3d(0, 0, 0.2921),
-                    camAngle);
-            public static final Transform3d ROBOT_TO_CAMERA = CAMERA_TO_ROBOT.inverse();
-        }
+        // AMP and SPEAKER velocity presets
+        public static final double AMP = 10;
+        public static final double SPEAKER = 15;// 15; // changed from 50 to 15 - bentley 11/13/24
 
     }
+    public static final class Elevator {
+        // TODO Set elevator constants 
 
+        public static final class elevatorShaft {
+            public static final int shaftMotorID = 7;
+            public static final int shaftMotorWSID = 16;
+            public static final int laserCan1ID = -1; //TODO
+            public static final int laserCan2ID = -1; //TODO
+            public static final double kP = 0.01; // TODO
+            public static final double kI = 0; // TODO
+            public static final double kD = 0; // TODO
+            public static final double kS = 0; // TODO
+            public static final double kG = 0; // TODO
+            public static final double kV = 0; // TODO
+            public static final double kA = 0; // TODO
+            public static final double kMaxVelocity = 0; // TODO
+            public static final double kMaxAcceleration = 0; // TODO
+            public static final double kElevatorMotorRampRate = 0.1; 
+            public static final double kErrorTolerance = 100;
+            public static final double kFULLEXTENSION = -2022; // TODO
+            public static final double kLEVEL1 = 0; 
+            public static final double kLEVEL2 = 0;
+            public static final double kLEVEL3 = 0;
+            public static final double kLEVEL4 = 0;
+
+        }
+        
+    }
+    public static final class Outtake{
+        public static final int outtakeMotorID = 5;
+        public static final int outtakeMotorWSID = 8;
+        public static final double kLaserDistCali1 = 200;
+        public static final double kLaserDistCali2 = 200;
+    }
+    public static final class Climber {
+        public static final int rotMotorID = 9; // climber left
+        public static final double tolerance = 1.0;
+        public static final double kP = 0.01;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double gearRatio = 25;
+        public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
+                Rotation2d.fromDegrees(2022) };
+    }
+    public static final class intake {
+        public static final double tolerance = 0.1;
+
+        public static final class intakeArm {
+            public static final int rotMotorID = 12; // TODO
+            public static final double kP = 0.005;
+            public static final double kI = 0;
+            public static final double kD = 0.0001;
+            public static final double gearRatio = 100;
+
+        }
+
+        public static final class intakeMotor {
+            public static final int IDR = 0;
+            public static final int IDL = 1;
+
+        }
+
+        public static final Rotation2d INTAKE = Rotation2d.fromDegrees(-200);
+        public static final Rotation2d AMPSHOT = Rotation2d.fromDegrees(-94 + 10 + 5);
+        public static final Rotation2d IDLE = Rotation2d.fromDegrees(0);
+
+    }
     public static final class AutoConstants {
 
         public static final double kMaxSpeedMetersPerSecond = 0.5;
