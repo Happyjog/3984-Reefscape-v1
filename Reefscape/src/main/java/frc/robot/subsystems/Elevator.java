@@ -77,9 +77,7 @@ public class Elevator extends SubsystemBase{
             Constants.Elevator.elevatorShaft.kP, 
             Constants.Elevator.elevatorShaft.kI, 
             Constants.Elevator.elevatorShaft.kD, 
-            new TrapezoidProfile.Constraints(
-                Constants.Elevator.elevatorShaft.kMaxVelocity, 
-                Constants.Elevator.elevatorShaft.kMaxAcceleration));
+            Constants.Elevator.elevatorShaft.kElevatorConstraints);
         elevatorFeedforward = new ElevatorFeedforward(
             Constants.Elevator.elevatorShaft.kS, 
             Constants.Elevator.elevatorShaft.kG, 

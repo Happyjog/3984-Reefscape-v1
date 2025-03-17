@@ -7,12 +7,8 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 // import com.pathplanner.lib.path.PathConstraints;
 //import com.pathplanner.lib.PathConstraints;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -160,6 +156,54 @@ public final class Constants {
                     canCoderID, angleOffset);
         }
     }
+    
+    public static final class Elevator {
+        // TODO Set elevator constants 
+
+        public static final class elevatorShaft {
+            public static final int shaftMotorID = 7;
+            public static final int shaftMotorWSID = 16;
+            public static final int laserCan1ID = -1; //TODO
+            public static final int laserCan2ID = -1; //TODO
+            public static final double kP = 0.01; // TODO
+            public static final double kI = 0; // TODO
+            public static final double kD = 0; // TODO
+            public static final double kS = 0; // TODO
+            public static final double kG = 0; // TODO
+            public static final double kV = 0; // TODO
+            public static final double kA = 0; // TODO
+            public static final double kMaxVelocity = 0; // TODO
+            public static final double kMaxAcceleration = 0; // TODO
+            public static final double kElevatorMotorRampRate = 0.1; 
+            public static final double kErrorTolerance = 100;
+            public static final double kFULLEXTENSION = -2022; // TODO
+            public static final double kLEVEL1 = 0; 
+            public static final double kLEVEL2 = 0;
+            public static final double kLEVEL3 = 0;
+            public static final double kLEVEL4 = 0;
+            public static final TrapezoidProfile.Constraints kElevatorConstraints = new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
+
+        }
+        
+    }
+    public static final class Outtake{
+        public static final int outtakeMotorID = 5;
+        public static final int outtakeMotorWSID = 8;
+        public static final double kLaserDistCali1 = 200;
+        public static final double kLaserDistCali2 = 200;
+    }
+    public static final class Climber {
+        public static final int rotMotorID = 9; // climber left
+        public static final double tolerance = 1.0;
+        public static final double kP = 0.01;
+        public static final double kI = 0;
+        public static final double kD = 0;
+        public static final double gearRatio = 25;
+        public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
+                Rotation2d.fromDegrees(2022) };
+    }
+
+    // TODO remove
     public static final class Flywheel {
         public static final double FWDiameter = 4.0; // Inches NEED TO CONVERT
         public static final double tolerance = 1; // Meters per second // changed from 1 to 0.25 - bentley 11/13/24
@@ -187,50 +231,7 @@ public final class Constants {
         public static final double SPEAKER = 15;// 15; // changed from 50 to 15 - bentley 11/13/24
 
     }
-    public static final class Elevator {
-        // TODO Set elevator constants 
-
-        public static final class elevatorShaft {
-            public static final int shaftMotorID = 7;
-            public static final int shaftMotorWSID = 16;
-            public static final int laserCan1ID = -1; //TODO
-            public static final int laserCan2ID = -1; //TODO
-            public static final double kP = 0.01; // TODO
-            public static final double kI = 0; // TODO
-            public static final double kD = 0; // TODO
-            public static final double kS = 0; // TODO
-            public static final double kG = 0; // TODO
-            public static final double kV = 0; // TODO
-            public static final double kA = 0; // TODO
-            public static final double kMaxVelocity = 0; // TODO
-            public static final double kMaxAcceleration = 0; // TODO
-            public static final double kElevatorMotorRampRate = 0.1; 
-            public static final double kErrorTolerance = 100;
-            public static final double kFULLEXTENSION = -2022; // TODO
-            public static final double kLEVEL1 = 0; 
-            public static final double kLEVEL2 = 0;
-            public static final double kLEVEL3 = 0;
-            public static final double kLEVEL4 = 0;
-
-        }
-        
-    }
-    public static final class Outtake{
-        public static final int outtakeMotorID = 5;
-        public static final int outtakeMotorWSID = 8;
-        public static final double kLaserDistCali1 = 200;
-        public static final double kLaserDistCali2 = 200;
-    }
-    public static final class Climber {
-        public static final int rotMotorID = 9; // climber left
-        public static final double tolerance = 1.0;
-        public static final double kP = 0.01;
-        public static final double kI = 0;
-        public static final double kD = 0;
-        public static final double gearRatio = 25;
-        public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
-                Rotation2d.fromDegrees(2022) };
-    }
+    // TODO remove
     public static final class intake {
         public static final double tolerance = 0.1;
 

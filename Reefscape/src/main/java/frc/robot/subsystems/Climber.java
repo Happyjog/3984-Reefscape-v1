@@ -213,10 +213,7 @@ public class Climber extends SubsystemBase{
         else{
             ratchetServo.setPosition(1);
         }
-        SmartDashboard.putBoolean("Ready To Shoot?", atSetpoint);
-        SmartDashboard.putNumber("lywhell Vellovity", summonPosition());
-        SmartDashboard.putNumber("Climb Position", climbMotorEncoder.getPosition());
-        // SmartDashboard.putBoolean("Ratchet Locked?", true);
+        SmartDashboard.putNumber("Climb Position", summonPosition());
         SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));
     }
 
