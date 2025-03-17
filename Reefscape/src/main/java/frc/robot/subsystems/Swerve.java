@@ -54,7 +54,7 @@ public class Swerve extends SubsystemBase {
   public Swerve(/*PhotonCamera cam*/) {
     curr_tag_in_view = -1;
     // this.cam = cam;
-    gyro1 = new Pigeon2(5);
+    gyro1 = new Pigeon2(0);
     gyro1.getConfigurator().apply(new Pigeon2Configuration());
     zeroGyro();
     mSwerveMods = new SwerveModule[] {

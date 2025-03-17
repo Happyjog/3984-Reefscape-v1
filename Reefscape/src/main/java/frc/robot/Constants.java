@@ -178,9 +178,9 @@ public final class Constants {
             public static final double kErrorTolerance = 100;
             public static final double kFULLEXTENSION = -2022; // TODO
             public static final double kLEVEL1 = 0; 
-            public static final double kLEVEL2 = 0;
-            public static final double kLEVEL3 = 0;
-            public static final double kLEVEL4 = 0;
+            public static final double kLEVEL2 = 2210;
+            public static final double kLEVEL3 = 5186;
+            public static final double kLEVEL4 = 9600;
             public static final TrapezoidProfile.Constraints kElevatorConstraints = new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
 
         }
@@ -201,6 +201,8 @@ public final class Constants {
         public static final double gearRatio = 25;
         public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
                 Rotation2d.fromDegrees(2022) };
+        public static final double kClimberOut = 151.82936096191406;
+        public static final double kClimberIn = 0;
     }
 
     // TODO remove

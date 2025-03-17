@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.WaitForCoralCommand;
@@ -65,7 +66,7 @@ public class RobotContainer {
   // private final PhotonCamera cam = new PhotonCamera("Global_Shutter_Camera");
   // private final PhotonCamera cam2 = new
   // PhotonCamera("Microsoft_LifeCam_HD-3000");
-  private final SendableChooser<Command> autoChooser;
+  // private final SendableChooser<Command> autoChooser;
   private final Swerve s_Swerve = new Swerve();
   private final Elevator s_Elevator = new Elevator();
   private final Climber s_Climber = new Climber();
@@ -78,21 +79,21 @@ public class RobotContainer {
   /* The container for the robot. subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Pathplanner commands
-    NamedCommands.registerCommand("WaitForCoral", new WaitForCoralCommand());
+    // NamedCommands.registerCommand("WaitForCoral", s_Spitter.WaitForCoralCommand());
 
-    NamedCommands.registerCommand("ScoreL4", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
-    NamedCommands.registerCommand("ScoreL3", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
-    NamedCommands.registerCommand("ScoreL2", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
-    NamedCommands.registerCommand("ScoreL1", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
+    // NamedCommands.registerCommand("ScoreL4", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
+    // NamedCommands.registerCommand("ScoreL3", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
+    // NamedCommands.registerCommand("ScoreL2", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
+    // NamedCommands.registerCommand("ScoreL1", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
 
-    NamedCommands.registerCommand("ScoreR4", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
-    NamedCommands.registerCommand("ScoreR3", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
-    NamedCommands.registerCommand("ScoreR2", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
-    NamedCommands.registerCommand("ScoreR1", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
+    // NamedCommands.registerCommand("ScoreR4", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
+    // NamedCommands.registerCommand("ScoreR3", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
+    // NamedCommands.registerCommand("ScoreR2", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
+    // NamedCommands.registerCommand("ScoreR1", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
 
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
-    SmartDashboard.putData("AutoChooser", autoChooser);
+    // SmartDashboard.putData("AutoChooser", autoChooser);
     s_Swerve.setDefaultCommand(
         new TeleopSwerve(
             s_Swerve,
@@ -103,10 +104,10 @@ public class RobotContainer {
             () -> driver.leftBumper().getAsBoolean(),
             () -> driver.x().getAsBoolean()));
     // TODO Remove manual control later
-    s_Elevator.setDefaultCommand(
-        s_Elevator.manualShaftControl(
-            () -> driver.leftBumper().getAsBoolean(),
-            () -> driver.rightBumper().getAsBoolean()));
+    // s_Elevator.setDefaultCommand(
+    //     s_Elevator.manualShaftControl(
+    //         () -> driver.leftBumper().getAsBoolean(),
+    //         () -> driver.rightBumper().getAsBoolean()));
     // s_Climber.setDefaultCommand(
     // s_Climber.manualControl(
     // ()-> driver.leftBumper().getAsBoolean(),
@@ -131,6 +132,9 @@ public class RobotContainer {
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     driver.x().onTrue(new InstantCommand(() -> s_Swerve.setAbsolute()));
     driver.a().onTrue(new InstantCommand(() -> s_Spitter.OuttakeOut()));
+    driver.leftBumper().onTrue(new InstantCommand(()->s_Climber.trapOn()));
+    driver.rightBumper().onTrue(new InstantCommand(()->s_Climber.trapOff()));
+
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
     // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1,
@@ -154,7 +158,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return new InstantCommand();//autoChooser.getSelected();
   }
   // public Command testPath(){return new PathPlannerAuto("testAuto");}
   // // Left side autos

@@ -14,18 +14,22 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.lib.math.MathUtils;
 
 
 public class Climber extends SubsystemBase{
     private SparkMax climbMotor;
     private RelativeEncoder climbMotorEncoder;
     private SparkClosedLoopController climbMotorPID;
+    private PIDController elevatorMotorPID;
     private PWM trapServo;
     private PWM ratchetServo;
     private boolean climbMotorDirection;
@@ -37,6 +41,7 @@ public class Climber extends SubsystemBase{
         SparkMaxConfig climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
         climbMotorConfig.closedLoop.pid(Constants.Climber.kP, Constants.Climber.kI, Constants.Climber.kD);
+        elevatorMotorPID = new PIDController(Constants.Climber.kP, Constants.Climber.kI, Constants.Climber.kD);
         climbMotor.configure(climbMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         climbMotorEncoder = climbMotor.getEncoder();
         climbMotorEncoder.setPosition(0);
@@ -67,6 +72,13 @@ public class Climber extends SubsystemBase{
     }
     private boolean atSetpoint = false;
 
+    public void reachGoal(double goal){
+        double voltageOutput = MathUtils.clamp(elevatorMotorPID.calculate(summonPosition(), goal), 7, -7);
+        climbMotor.setVoltage(voltageOutput);
+    }
+    public Command arise(double goal){
+        return run(()->{reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance);
+    }
 
     /*public Command moveTo(BooleanSupplier amp, BooleanSupplier speaker, DoubleSupplier trigger){
         final double[] v = new double[]{(amp.getAsBoolean())? flywheel.AMP: flywheel.SPEAKER, (amp.getAsBoolean())? flywheel.AMP: flywheel.SPEAKER};
@@ -140,7 +152,13 @@ public class Climber extends SubsystemBase{
         // ratchetServo.setPosition((pos.getAsBoolean()) ? 0 : 1);
         return pos.getAsBoolean();
     }
-
+    public void trapOn(){
+        // trapServo.setSpeed(1);
+        trapServo.setPosition(1);
+    }
+    public void trapOff(){
+        trapServo.setSpeed(0);
+    }
 
     
     public Command moveTill(double goalPos, boolean idleState){

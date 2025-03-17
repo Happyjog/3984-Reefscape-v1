@@ -29,8 +29,8 @@ public class Spitter extends SubsystemBase {
     public Spitter() {
         laser1 = new LaserCan(0);     
         laser2 = new LaserCan(0);    
-        prevlaser1val = checklaser1();
-        prevlaser2val = checklaser2(); 
+        // prevlaser1val = checklaser1();
+        // prevlaser2val = checklaser2(); 
         outtakeMotor = new SparkMax(
                 Constants.Outtake.outtakeMotorID,
                 MotorType.kBrushed);
@@ -74,10 +74,21 @@ public class Spitter extends SubsystemBase {
     }
 
     public boolean checklaser1(){
-        return laser1.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali1;
+        if (laser1.getMeasurement() != null){
+            return laser1.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali1;
+        }
+        else{
+            return false;
+        }
     }
     public boolean checklaser2(){
-        return laser2.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali2;
+        if (laser1.getMeasurement() != null){
+            return laser2.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali2;
+        }
+        else{
+            return false;
+        }
+        // return laser2.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali2;
     }
     public boolean checkCoral(){
         if (mode){
@@ -89,38 +100,41 @@ public class Spitter extends SubsystemBase {
     }
     
     public void periodic() {
-        if (checklaser1() != prevlaser1val){
-            l1count += 1;
-            prevlaser1val = checklaser1();
-        }
-        if (checklaser2() != prevlaser2val){
-            l2count += 1;
-            prevlaser2val = checklaser2();
-        }
-        // If mode is outtake mode
-        if (mode){
-            // And coral is detected as possessed
-            boolean coralPossession = checkCoral();
-            // Switch to scoring mode
-            if (coralPossession){
-                OuttakeStopManual();
-                l1count = 0;
-                l2count = 0;
-                mode = false; 
-            }
-        }
-        else{
-            // If mode is scoring mode
-            // And coral is detected as scored
-            boolean coralScored = checkCoral();
-            // Switch to intake mode
-            if (coralScored){
-                OuttakeStopManual();
-                l1count = 0;
-                l2count = 0;
-                mode = true; 
-            }   
-        }
+        
+
+
+        // if (checklaser1() != prevlaser1val){
+        //     l1count += 1;
+        //     prevlaser1val = checklaser1();
+        // }
+        // if (checklaser2() != prevlaser2val){
+        //     l2count += 1;
+        //     prevlaser2val = checklaser2();
+        // }
+        // // If mode is outtake mode
+        // if (mode){
+        //     // And coral is detected as possessed
+        //     boolean coralPossession = checkCoral();
+        //     // Switch to scoring mode
+        //     if (coralPossession){
+        //         OuttakeStopManual();
+        //         l1count = 0;
+        //         l2count = 0;
+        //         mode = false; 
+        //     }
+        // }
+        // else{
+        //     // If mode is scoring mode
+        //     // And coral is detected as scored
+        //     boolean coralScored = checkCoral();
+        //     // Switch to intake mode
+        //     if (coralScored){
+        //         OuttakeStopManual();
+        //         l1count = 0;
+        //         l2count = 0;
+        //         mode = true; 
+        //     }   
+        // }
 
         SmartDashboard.putBoolean("Coral Possessed?", mode);
     }
