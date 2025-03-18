@@ -175,7 +175,7 @@ public final class Constants {
             public static final double kMaxVelocity = 0; // TODO
             public static final double kMaxAcceleration = 0; // TODO
             public static final double kElevatorMotorRampRate = 0.1; 
-            public static final double kErrorTolerance = 100;
+            public static final double kErrorTolerance = 0;
             public static final double kFULLEXTENSION = -2022; // TODO
             public static final double kLEVEL1 = 0; 
             public static final double kLEVEL2 = 2210;

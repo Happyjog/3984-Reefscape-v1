@@ -132,7 +132,9 @@ public class Elevator extends SubsystemBase{
     }
     //PID Runner
     public Command setHeight(double goal){
-        return run(()->{reachGoalNoProfile(goal);}).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance);
+        System.out.println("ran");
+        System.out.println(Math.abs(getPos().getDegrees() - goal));
+        return run(()->{System.out.println(Math.abs(getPos().getDegrees() - goal));}).until(()->Math.abs(getPos().getDegrees() - goal) < 0);
     }
 
 

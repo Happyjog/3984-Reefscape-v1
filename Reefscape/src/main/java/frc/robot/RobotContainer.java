@@ -132,7 +132,7 @@ public class RobotContainer {
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     driver.x().onTrue(new InstantCommand(() -> s_Swerve.setAbsolute()));
     driver.a().onTrue(new InstantCommand(() -> s_Spitter.OuttakeOut()));
-
+    driver.b().onTrue(new InstantCommand(() -> s_Elevator.setHeight(Constants.Elevator.elevatorShaft.kLEVEL2)));
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
     // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1,

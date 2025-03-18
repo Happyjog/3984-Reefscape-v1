@@ -30,8 +30,8 @@ public class Spitter extends SubsystemBase {
     private boolean first = true; // True is intake mode, False is scoring mode
     private boolean coralPosessed = false;
     public Spitter() {
-        laser1 = new LaserCan(17);     
-        laser2 = new LaserCan(18);    
+        laser1 = new LaserCan(18);     
+        laser2 = new LaserCan(17);    
         prevlaser1val = false;
         prevlaser2val = false; 
         outtakeMotor = new SparkMax(
@@ -51,24 +51,21 @@ public class Spitter extends SubsystemBase {
     public void OuttakeOut() {
         if (coralPosessed){
 
-            outtakeMotorWS.set(.9);
-            outtakeMotor.set(-.9);
+            outtakeMotorWS.set(.7);
+            outtakeMotor.set(-.7);
         }
         else if (!coralPosessed){
             System.out.println("making faster go");
             if (laser2.getMeasurement().distance_mm < 200){
-                outtakeMotorWS.set(.9);
-                outtakeMotor.set(-.9);
+                outtakeMotorWS.set(.7);
+                outtakeMotor.set(-.7);
             }
             else{
-                outtakeMotorWS.set(.9);
-                outtakeMotor.set(-.9);
+                outtakeMotorWS.set(.5);
+                outtakeMotor.set(-.5);
             }
         }
             
-    }
-    public void OuttakeOutSspeed() {
-
     }
 
     public void OuttakeIn() {
@@ -152,29 +149,23 @@ public class Spitter extends SubsystemBase {
         //     l2count += 1;
         //     prevlaser2val = checklaser2();
         // }
-        if (!coralPosessed){
-            if (checklaser2()){
-                first = false;      
-                OuttakeOutSspeed();
-            }
+        // if (checklaser1() != prevlaser1val){
+        //     l1count +=1;
+        //     prevlaser1val = checklaser1();
+        // }
+        // if (checklaser2() != prevlaser2val){
+        //     l2count +=1;
+        //     prevlaser2val = checklaser2();
+        // }
+        // System.out.println(checklaser2() + " " + l1count);
+        // System.out.println(checklaser1() + " " + l2count);
+        if (coralPosessed != true){
 
-            if (first == false){
-
-                // System.out.println(checklaser2());
-                if (laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 150){
-                    System.out.println(laser1.getMeasurement().distance_mm);
-                    System.out.println("posessed");
-                    
-                    // try {
-                    //     TimeUnit.SECONDS.sleep(1);
-                    // } catch (InterruptedException e) {
-                    //     // TODO Auto-generated catch block
-                    //     e.printStackTrace();
-                    // }
-                    OuttakeStopManual();
-                    first = true;
-                    coralPosessed = true;
-                }
+            if (laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
+                OuttakeStopManual();
+                first = true;
+                coralPosessed = true;
+                
                 
                 
             }
