@@ -33,11 +33,13 @@ public class Climber extends SubsystemBase{
     private PWM trapServo;
     private PWM ratchetServo;
     private boolean climbMotorDirection;
+    private boolean idleClimb;
     public Climber() {
         // initialies all the variables and constants
         climbMotor = new SparkMax(frc.robot.Constants.Climber.rotMotorID, MotorType.kBrushless );
         trapServo = new PWM(Constants.Swerve.trapServoID);
         ratchetServo = new PWM(Constants.Swerve.ratchetServoID);
+        ratchetServo.setPosition(0);
         SparkMaxConfig climbMotorConfig = new SparkMaxConfig();
         climbMotorConfig.idleMode(IdleMode.kBrake).inverted(false);
         climbMotorConfig.closedLoop.pid(Constants.Climber.kP, Constants.Climber.kI, Constants.Climber.kD);
@@ -143,14 +145,22 @@ public class Climber extends SubsystemBase{
                 }
             }))*/
         
-    public boolean ratchetControl(BooleanSupplier pos){
+    public Command ratchetControl(BooleanSupplier pos){
         if(pos.getAsBoolean()){
-            ratchetServo.setPosition(0);
+            return run(()->{ratchetServo.setPosition(0);});
         }else{
-            ratchetServo.setPosition(1);
+            return run(()->{ratchetServo.setPosition(1);});
         }
         // ratchetServo.setPosition((pos.getAsBoolean()) ? 0 : 1);
-        return pos.getAsBoolean();
+        // return pos.getAsBoolean();
+    }
+    public void ratchetOn(){
+        // trapServo.setSpeed(1);
+        ratchetServo.setPosition(1);
+        System.out.println("yes");
+    }
+    public void ratchetOff(){
+        ratchetServo.setPosition(0);
     }
     public void trapOn(){
         // trapServo.setSpeed(1);
@@ -199,13 +209,16 @@ public class Climber extends SubsystemBase{
      public void Down(){
         climbMotor.set(-.5);
         climbMotorDirection = false;
+        idleClimb = false;
     }
     public void Up(){
         climbMotor.set(.5);
         climbMotorDirection = true;
+        idleClimb = false;
     }
     public void Stop(){
         climbMotor.stopMotor();
+        idleClimb = true;
     }
     public Command manualControl(BooleanSupplier up, BooleanSupplier down){
         return run(()->{
@@ -225,14 +238,21 @@ public class Climber extends SubsystemBase{
 
     
     public void periodic(){
-        if (climbMotorDirection){
-            ratchetServo.setPosition(0);
+        if (!idleClimb){
+            if (climbMotorDirection){
+
+                ratchetServo.setPosition(1);
+            }
+            else{
+                ratchetServo.setPosition(0);
+            }
         }
         else{
-            ratchetServo.setPosition(1);
+            ratchetServo.setPosition(0);
         }
-        SmartDashboard.putNumber("Climb Position", summonPosition());
-        SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));
+        // System.out.println(ratchetServo.getPosition());
+        SmartDashboard.putNumber("Climb Position", ratchetServo.getPosition());
+        // SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));
     }
 
 

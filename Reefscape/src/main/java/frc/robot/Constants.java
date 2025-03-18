@@ -163,8 +163,8 @@ public final class Constants {
         public static final class elevatorShaft {
             public static final int shaftMotorID = 7;
             public static final int shaftMotorWSID = 16;
-            public static final int laserCan1ID = -1; //TODO
-            public static final int laserCan2ID = -1; //TODO
+            public static final int laserCan1ID = 17; //TODO
+            public static final int laserCan2ID = 18; //TODO
             public static final double kP = 0.01; // TODO
             public static final double kI = 0; // TODO
             public static final double kD = 0; // TODO
@@ -189,8 +189,8 @@ public final class Constants {
     public static final class Outtake{
         public static final int outtakeMotorID = 5;
         public static final int outtakeMotorWSID = 8;
-        public static final double kLaserDistCali1 = 200;
-        public static final double kLaserDistCali2 = 200;
+        public static final double kLaserDistCali1 = 100;
+        public static final double kLaserDistCali2 = 100;
     }
     public static final class Climber {
         public static final int rotMotorID = 9; // climber left
