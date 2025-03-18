@@ -19,6 +19,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,7 +43,7 @@ public class Elevator extends SubsystemBase{
     private PIDController elevatorMotorPID;
     private ProfiledPIDController elevatorMotorProfiledPID;
     private ElevatorFeedforward elevatorFeedforward;
-
+    private boolean settingHeight = false;
     public Elevator(){
         limitSwitch1 = new DigitalInput(Constants.Swerve.limitSwitch1ID);
         limitSwitch2 = new DigitalInput(Constants.Swerve.limitSwitch2ID);   
@@ -120,21 +121,20 @@ public class Elevator extends SubsystemBase{
     // Unprofiled PID Control
     public void reachGoalNoProfile(double goal){
         double voltageOutput = MathUtils.clamp(elevatorMotorPID.calculate(getPos().getDegrees(), goal), 7, -7);
-        elevatorMotor.setVoltage(-voltageOutput);
-        elevatorMotorWS.setVoltage(voltageOutput);
+        elevatorMotor.setVoltage(voltageOutput);
+        elevatorMotorWS.setVoltage(-voltageOutput);
     }
     // Profiled PID Control + ff
     public void reachGoal(double goal){
         double voltageOutput = MathUtils.clamp(elevatorFeedforward.calculateWithVelocities(getVelocity(), elevatorMotorProfiledPID.getSetpoint().velocity)
             + elevatorMotorProfiledPID.calculate(getPos().getDegrees(), goal), 7, -7); 
-        elevatorMotor.setVoltage(-voltageOutput);
-        elevatorMotorWS.setVoltage(voltageOutput);
+        System.out.println(voltageOutput);
+        elevatorMotor.setVoltage(voltageOutput);
+        elevatorMotorWS.setVoltage(-voltageOutput);
     }
     //PID Runner
     public Command setHeight(double goal){
-        System.out.println("ran");
-        System.out.println(Math.abs(getPos().getDegrees() - goal));
-        return run(()->{System.out.println(Math.abs(getPos().getDegrees() - goal));}).until(()->Math.abs(getPos().getDegrees() - goal) < 0);
+        return run(()->{settingHeight=true; reachGoal(goal); System.out.println(getPos().getDegrees());}).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
     }
 
 
@@ -167,7 +167,7 @@ public class Elevator extends SubsystemBase{
     }
     // Get and Reset methods:
     public Rotation2d getPos(){
-        Rotation2d posElevatorMotor = Rotation2d.fromDegrees(elevatorMotorEncoder.get()); 
+        Rotation2d posElevatorMotor = Rotation2d.fromDegrees(elevatorMotorEncoder.getDistance()); 
         return posElevatorMotor;
     }
     public void resetPos(){
@@ -184,10 +184,16 @@ public class Elevator extends SubsystemBase{
 
     // Periodic
     public void periodic(){
+        String s = NetworkTableInstance.getDefault().getTable("ButtonBoard").getStringTopic("cumber").toString();
+        // System.out.println(s);
+        if (!settingHeight){
+            setHeight(getPos().getDegrees());
+        }
         // If elevator has reached bottom, reset to 0 to avoid drift and stuff.
         if (!limitSwitch1.get() && !limitSwitch2.get()){
             resetPos();
         }
+        // System.out.println(getPos().getDegrees());
         SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
     }
 }

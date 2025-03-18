@@ -51,18 +51,17 @@ public class Spitter extends SubsystemBase {
     public void OuttakeOut() {
         if (coralPosessed){
 
-            outtakeMotorWS.set(.7);
-            outtakeMotor.set(-.7);
+            outtakeMotorWS.set(.5);
+            outtakeMotor.set(-.5);
         }
         else if (!coralPosessed){
-            System.out.println("making faster go");
             if (laser2.getMeasurement().distance_mm < 200){
-                outtakeMotorWS.set(.7);
-                outtakeMotor.set(-.7);
+                outtakeMotorWS.set(.35);
+                outtakeMotor.set(-.35);
             }
             else{
-                outtakeMotorWS.set(.5);
-                outtakeMotor.set(-.5);
+                outtakeMotorWS.set(.45);
+                outtakeMotor.set(-.45);
             }
         }
             

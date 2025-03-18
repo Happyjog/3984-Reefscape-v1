@@ -165,22 +165,22 @@ public final class Constants {
             public static final int shaftMotorWSID = 16;
             public static final int laserCan1ID = 17; //TODO
             public static final int laserCan2ID = 18; //TODO
-            public static final double kP = 0.01; // TODO
-            public static final double kI = 0; // TODO
-            public static final double kD = 0; // TODO
+            public static final double kP = 0.001; // TODO
+            public static final double kI = 0.00003; // TODO
+            public static final double kD = 0.00001; // TODO
             public static final double kS = 0; // TODO
-            public static final double kG = 0; // TODO
+            public static final double kG = 0.9; // TODO
             public static final double kV = 0; // TODO
             public static final double kA = 0; // TODO
             public static final double kMaxVelocity = 0; // TODO
             public static final double kMaxAcceleration = 0; // TODO
             public static final double kElevatorMotorRampRate = 0.1; 
-            public static final double kErrorTolerance = 0;
+            public static final double kErrorTolerance = 100;
             public static final double kFULLEXTENSION = -2022; // TODO
             public static final double kLEVEL1 = 0; 
             public static final double kLEVEL2 = 2210;
             public static final double kLEVEL3 = 5186;
-            public static final double kLEVEL4 = 9600;
+            public static final double kLEVEL4 = 9750;
             public static final TrapezoidProfile.Constraints kElevatorConstraints = new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
 
         }
