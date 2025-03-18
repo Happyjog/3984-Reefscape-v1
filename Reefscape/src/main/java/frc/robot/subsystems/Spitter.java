@@ -25,15 +25,13 @@ public class Spitter extends SubsystemBase {
     private LaserCan laser2;
     private int l1count = 0;
     private int l2count = 0;
-    private boolean prevlaser1val;
-    private boolean prevlaser2val;
-    private boolean first = true; // True is intake mode, False is scoring mode
+    private String[] states = {"Coral Intake", "Coral Posessed", "Coral Scoring"};
+    private String curr_state = states[0];
+    private boolean first = false; // True is intake mode, False is scoring mode
     private boolean coralPosessed = false;
     public Spitter() {
         laser1 = new LaserCan(18);     
         laser2 = new LaserCan(17);    
-        prevlaser1val = false;
-        prevlaser2val = false; 
         outtakeMotor = new SparkMax(
                 Constants.Outtake.outtakeMotorID,
                 MotorType.kBrushed);
@@ -47,10 +45,19 @@ public class Spitter extends SubsystemBase {
         outtakeMotorWS.configure(outtakeMotorConfigWS, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     }
-
+    public void runOutake(){
+        if (curr_state.equals(states[0])){
+            outtakeMotorWS.set(.5);
+            outtakeMotor.set(-.5);
+        }
+        else if(curr_state.equals(states[2])){
+            outtakeMotorWS.set(.5);
+            outtakeMotor.set(-.5);
+        }
+    }
     public void OuttakeOut() {
-        if (coralPosessed){
 
+        if (coralPosessed){
             outtakeMotorWS.set(.5);
             outtakeMotor.set(-.5);
         }
@@ -116,94 +123,54 @@ public class Spitter extends SubsystemBase {
             return l2count == 1;
         }
     }
-    
+    // state [0] = intake, state [1] = posessed, state [2] = scoring
     public void periodic() {
-        // if (laser1.getMeasurement() != null ){
-        //     if (laser1.getMeasurement().distance_mm < 50){
-        //         System.out.println("triggered1");
-        //     }
-        //     else{
-        //         System.out.println("not trigger1");
-        //     }
-        // }
-        // if (laser2.getMeasurement() != null){
-        //     if (laser2.getMeasurement().distance_mm < 100){
-        //         System.out.println("triggered2");
-        //     }
-        //     else{
-        //         System.out.println("not trigger2");
-        //     }
-
-        // }
-        // else{
-        //     System.out.println("null");
-        // // }
-        // System.out.println(l1count);
-        // System.out.println(l2count);
-        // if (checklaser1() != prevlaser1val){
-        //     l1count += 1;
-        //     prevlaser1val = checklaser1();
-        // }
-        // if (checklaser2() != prevlaser2val){
-        //     l2count += 1;
-        //     prevlaser2val = checklaser2();
-        // }
-        // if (checklaser1() != prevlaser1val){
-        //     l1count +=1;
-        //     prevlaser1val = checklaser1();
-        // }
-        // if (checklaser2() != prevlaser2val){
-        //     l2count +=1;
-        //     prevlaser2val = checklaser2();
-        // }
-        // System.out.println(checklaser2() + " " + l1count);
-        // System.out.println(checklaser1() + " " + l2count);
-        if (coralPosessed != true){
-
-            if (laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
-                OuttakeStopManual();
+        // If current state is intake mode, check for coral posession
+        if (curr_state.equals(states[0])){
+            // FIRST, if first laser triggered
+            if (laser2.getMeasurement().distance_mm < 100){
                 first = true;
-                coralPosessed = true;
-                
-                
-                
             }
-        }
-        else{
-            // Ejection mode
-            System.out.println("ejaculrion mode: " + laser1.getMeasurement().distance_mm);
-            if (laser1.getMeasurement().distance_mm > 100 ){
-                System.out.println("not posessed anymore");
+            // THEN, check when first laser is no longer triggered, second laser is trigered . Now it is posessed
+            if (first && laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
+                first = false;
                 OuttakeStopManual();
-                coralPosessed = false;
+                curr_state = states[2];
             }
         }
-        // If mode is outtake mode
-        // if (mode){
-        //     // And coral is detected as possessed
-        //     boolean coralPossession = checkCoral();
-        //     // Switch to scoring mode
-        //     if (coralPossession){
-        //         System.out.println("coral possessed");        
+        if (curr_state.equals(states[2])){
+            // First make sure laser 2 is still triggered, coral is still posessed, if not, go back to intake mode
+            if (laser1.getMeasurement().distance_mm > 100){
+                OuttakeStopManual();
+                curr_state = states[0];
+            }
+        }
+
+        // if (laser)
+        // else{
+        //     l2count = 0;
+        // }
+        // if (coralPosessed != true){
+
+        //     if (laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
         //         OuttakeStopManual();
-        //         l1count = 0;
-        //         l2count = 0;
-        //         mode = false; 
+        //         first = true;
+        //         coralPosessed = true;
+                
+                
+                
         //     }
         // }
         // else{
-        //     // If mode is scoring mode
-        //     // And coral is detected as scored
-        //     boolean coralScored = checkCoral();
-        //     // Switch to intake mode
-        //     if (coralScored){
+        //     // Ejection mode
+        //     System.out.println("ejaculrion mode: " + laser1.getMeasurement().distance_mm);
+        //     if (laser1.getMeasurement().distance_mm > 100 ){
+        //         System.out.println("not posessed anymore");
         //         OuttakeStopManual();
-        //         l1count = 0;
-        //         l2count = 0;
-        //         mode = true; 
-        //     }   
+        //         coralPosessed = false;
+        //     }
         // }
 
-        SmartDashboard.putBoolean("Coral Possessed?", coralPosessed);
+        SmartDashboard.putString("Intake state", curr_state);
     }
 }
