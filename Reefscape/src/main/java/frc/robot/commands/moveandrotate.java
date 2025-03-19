@@ -18,20 +18,27 @@ import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.*;
 
-public class moveToOffset extends Command{
+public class moveandrotate extends Command{
     private final Swerve s_Swerve;
+    private final Elevator s_Elevator;
     private final Supplier<Pose2d> poseProvider;
     private final PIDController moveXController = new PIDController(2, 0, 0);//(2.1, 0, 0);
     private final PIDController moveYController = new PIDController(2, 0, 0);//(2.1, 0, 0);
+    private final PIDController moveTController = new PIDController(0.1, 0, 0);//(2.1, 0, 0);
+
     private final AprilTagFieldLayout layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private boolean isDone;
     private double x;
     private double y;
+    private double thetaGoal;
+
     private long curr_tag_in_view;
-    public moveToOffset(
+    public moveandrotate(
         Swerve s_Swerve,
+        Elevator s_Elevator,
         Supplier<Pose2d> poseProvider) {
         this.s_Swerve= s_Swerve;
+        this.s_Elevator = s_Elevator;
         this.poseProvider = poseProvider;
         // this.amount_offset = amount_offset;
         // moveXController.setTolerance(0.05);
@@ -59,8 +66,13 @@ public class moveToOffset extends Command{
             double tag_x = tag_pose.getX();
             double tag_y = tag_pose.getY();
             Rotation2d tag_theta = tag_pose.getRotation().minus(Rotation2d.fromDegrees(90));
-            double forward_offset = -1;
-            double lateral_offset = 0;
+            Rotation2d tag_theta_rot = tag_pose.getRotation().plus(Rotation2d.fromDegrees(180));
+            double diff_t = roboPose.getRotation().minus(tag_theta_rot).getDegrees();
+            System.out.println("t_dff" + diff_t + "angle tag" + tag_theta_rot + "robto angle: " + roboPose.getRotation().getDegrees());
+
+        
+            double forward_offset = -0.4;
+            double lateral_offset = 0.5;
             // double x_offset = tag_x + forward_offset * tag_theta.getCos() - lateral_offset * tag_theta.getSin();
             // double y_offset = tag_y + forward_offset * tag_theta.getSin() + lateral_offset * tag_theta.getCos();
             double x_offset = tag_x + forward_offset * tag_theta.getSin() - lateral_offset * tag_theta.getCos();
@@ -73,11 +85,12 @@ public class moveToOffset extends Command{
             // System.out.println("HEEEYEEYYEYEYE: " + diff_x + "and"+ diff_y)
             x = x_offset;
             y = y_offset;
+            thetaGoal = tag_theta_rot.getDegrees();
+
             // x = tag_pose.getX();
             // y = tag_pose.getY();
 
         }
-        
         
     }
   
@@ -86,16 +99,19 @@ public class moveToOffset extends Command{
         System.out.println("Executed main loop: "+ isDone);
         var robotPose2d = poseProvider.get();
         if (isDone){
+            
             return;
         }
         double delx = x - robotPose2d.getX();
         double dely = y - robotPose2d.getY();
+        double delt =thetaGoal - robotPose2d.getRotation().getDegrees();
         System.out.println("ID: "+ curr_tag_in_view + " diff x: " + delx + " diff y: " + dely);
         // Output Volts is capped at 2 to prevent brownout
         double xOutput = Math.min(moveXController.calculate(-1*delx), 3);
         double yOutput = Math.min(moveYController.calculate(-1*dely), 3);
-        s_Swerve.drive(new Translation2d(xOutput, yOutput), 0, true, true);
-        if (Math.abs(delx) < 0.03 && Math.abs(dely) < 0.03){
+        double tOutput = Math.min(moveTController.calculate(-1*delt), 3);
+        s_Swerve.drive(new Translation2d(xOutput, yOutput), tOutput, true, true);
+        if (Math.abs(delx) < 0.05 && Math.abs(dely) < 0.05 && Math.abs(delt) < 5){
             isDone = true;
         }
         else{
@@ -109,7 +125,10 @@ public class moveToOffset extends Command{
     }
     @Override
     public void end(boolean interrupted) {
+        System.out.println("DONE");
+        // s_Elevator.setHeightButREAL();
         s_Swerve.stop();
+        
     }
     
 }

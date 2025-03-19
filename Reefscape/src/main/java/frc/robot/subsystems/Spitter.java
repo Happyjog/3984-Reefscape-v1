@@ -28,7 +28,10 @@ public class Spitter extends SubsystemBase {
     private String[] states = {"Coral Intake", "Coral Posessed", "Coral Scoring"};
     private String curr_state = states[0];
     private boolean first = false; // True is intake mode, False is scoring mode
+    private boolean inter = false; // True is intake mode, False is scoring mode
+
     private boolean coralPosessed = false;
+    
     public Spitter() {
         laser1 = new LaserCan(18);     
         laser2 = new LaserCan(17);    
@@ -47,13 +50,21 @@ public class Spitter extends SubsystemBase {
     }
     public void runOutake(){
         if (curr_state.equals(states[0])){
-            outtakeMotorWS.set(.5);
-            outtakeMotor.set(-.5);
+            if (inter){
+                outtakeMotorWS.set(.3);
+                outtakeMotor.set(-.3);
+            }
+            outtakeMotorWS.set(.45);
+            outtakeMotor.set(-.45);
+
         }
-        else if(curr_state.equals(states[2])){
-            outtakeMotorWS.set(.5);
-            outtakeMotor.set(-.5);
+        
+        else if(curr_state.equals(states[1])){
+            curr_state = states[2];
+            outtakeMotorWS.set(.6);
+            outtakeMotor.set(-.6);
         }
+        
     }
     public void OuttakeOut() {
 
@@ -75,8 +86,8 @@ public class Spitter extends SubsystemBase {
     }
 
     public void OuttakeIn() {
-        outtakeMotor.set(-.6);
-        outtakeMotorWS.set(.6);
+        outtakeMotor.set(.6);
+        outtakeMotorWS.set(-.6);
     }
 
     public void OuttakeStopManual() {
@@ -126,23 +137,35 @@ public class Spitter extends SubsystemBase {
     // state [0] = intake, state [1] = posessed, state [2] = scoring
     public void periodic() {
         // If current state is intake mode, check for coral posession
-        if (curr_state.equals(states[0])){
-            // FIRST, if first laser triggered
-            if (laser2.getMeasurement().distance_mm < 100){
-                first = true;
-            }
-            // THEN, check when first laser is no longer triggered, second laser is trigered . Now it is posessed
-            if (first && laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
-                first = false;
-                OuttakeStopManual();
-                curr_state = states[2];
-            }
-        }
-        if (curr_state.equals(states[2])){
-            // First make sure laser 2 is still triggered, coral is still posessed, if not, go back to intake mode
-            if (laser1.getMeasurement().distance_mm > 100){
-                OuttakeStopManual();
-                curr_state = states[0];
+        if (laser2.getMeasurement() != null){
+            if (laser1.getMeasurement() != null){
+                if (curr_state.equals(states[0])){
+                    // FIRST, if first laser triggered
+                    if (laser2.getMeasurement().distance_mm < 100){
+                        first = true;
+                    }
+                    // THEN, check when first laser is no longer triggered, second laser is trigered . Now it is posessed
+                    if (first && laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
+                        first = false;
+                        inter = false;
+                        OuttakeStopManual();
+                        curr_state = states[1];
+                    }
+                    if (laser2.getMeasurement().distance_mm < 200 && laser1.getMeasurement().distance_mm < 100){
+                        inter = true;
+                    }
+                }
+                if (curr_state.equals(states[1])){
+                    
+                    OuttakeStopManual();
+                }
+                if (curr_state.equals(states[2])){
+                    // First make sure laser 2 is still triggered, coral is still posessed, if not, go back to intake mode
+                    if (laser1.getMeasurement().distance_mm > 100){
+                        OuttakeStopManual();
+                        curr_state = states[0];
+                    }
+                }
             }
         }
 
@@ -170,7 +193,13 @@ public class Spitter extends SubsystemBase {
         //         coralPosessed = false;
         //     }
         // }
-
+        if (curr_state.equals(states[1])){
+            SmartDashboard.putBoolean("Loaded", true);
+        }
+        else{
+            SmartDashboard.putBoolean("Loaded", false);
+        }
+        
         SmartDashboard.putString("Intake state", curr_state);
     }
 }

@@ -51,9 +51,9 @@ public class TeleopSwerve extends Command {
         rotationLimiter.calculate(
             MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.Swerve.stickDeadband)) * 0.4;
     if (true){//halfSpeed.getAsBoolean()){
-      translationVal = translationVal * 0.5;
-      strafeVal = strafeVal *0.5;
-      rotationVal = rotationVal * 0.5;
+      translationVal = translationVal;
+      strafeVal = strafeVal;
+      rotationVal = rotationVal;
     }
 
     /* Drive */

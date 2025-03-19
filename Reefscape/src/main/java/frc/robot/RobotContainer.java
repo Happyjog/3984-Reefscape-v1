@@ -7,7 +7,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-
+import edu.wpi.first.math.geometry.Pose2d;
 
 // import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.auto.NamedCommands;
@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.WaitForCoralCommand;
 import frc.robot.commands.moveToOffset;
+import frc.robot.commands.moveToRotation;
+import frc.robot.commands.moveandrotate;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Climber;
@@ -71,6 +73,9 @@ public class RobotContainer {
   private final Elevator s_Elevator = new Elevator();
   private final Climber s_Climber = new Climber();
   private final Spitter s_Spitter = new Spitter();
+  private final moveToOffset movetotag = new moveToOffset(s_Swerve, s_Swerve::getPose);
+  private final moveToRotation moveToTagR = new moveToRotation(s_Swerve, s_Swerve::getPose);
+  private final moveandrotate MR_tag = new moveandrotate(s_Swerve, s_Elevator, s_Swerve::getPose);
 
   // TODO Add offsets
   private final moveToOffset moveL = new moveToOffset(s_Swerve, s_Swerve::getPose);
@@ -98,21 +103,20 @@ public class RobotContainer {
         new TeleopSwerve(
             s_Swerve,
             () -> -driver.getLeftY(),
-            () -> driver.getLeftX(),
+            () -> -driver.getLeftX(),
             () -> -driver.getRightX(),
             () -> false,
             () -> driver.leftBumper().getAsBoolean(),
             () -> driver.x().getAsBoolean()));
     // TODO Remove manual control later
-    s_Elevator.setDefaultCommand(
-        s_Elevator.manualShaftControl(
-            () -> driver.leftBumper().getAsBoolean(),
-            () -> driver.rightBumper().getAsBoolean()));
+    // s_Elevator.setDefaultCommand(
+    //     s_Elevator.resetDown());
     
     // s_Climber.setDefaultCommand(
     //   s_Climber.manualControl(
     //   ()-> driver.leftBumper().getAsBoolean(),
-    //   ()-> driver.rightBumper().getAsBoolean()
+    //   ()-> driver.rightBumper().getAsBoolean(),
+    //   ()-> driver.b().getAsBoolean()
     //   ));
 
     // Configure the button bindings
@@ -131,14 +135,16 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    driver.x().onTrue(new InstantCommand(() -> s_Swerve.setAbsolute()));
-    driver.a().onTrue(new InstantCommand(() -> s_Spitter.OuttakeOut()));
-    driver.b().onTrue(s_Elevator.setHeight(Constants.Elevator.elevatorShaft.kLEVEL4));
-    driver.start().onTrue(s_Elevator.setHeight(Constants.Elevator.elevatorShaft.kLEVEL1));
+    driver.x().onTrue(new InstantCommand(() -> s_Climber.trapOn()));
+    driver.x().onFalse(new InstantCommand(() -> s_Climber.trapOff()));
+    driver.a().onTrue(new InstantCommand(() -> s_Spitter.runOutake()));
+    // driver.rightBumper().onTrue(new InstantCommand(()->s_Spitter.OuttakeIn()));
+    driver.b().onTrue(MR_tag.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(()->s_Spitter.runOutake())));
+    driver.b().whileFalse(s_Elevator.resetDown());
+    // driver.start().onTrue(s_Elevator.setHeight());
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
-    // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1,
-    // s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
+    // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1,s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
     // driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
     // second.rightTrigger(0.3).whileTrue(intake.Out());
     // second.leftTrigger(0.3).whileTrue(fwheel.moveTo(flywheel.SPEAKER,

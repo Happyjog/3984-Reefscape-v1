@@ -157,7 +157,6 @@ public class Climber extends SubsystemBase{
     public void ratchetOn(){
         // trapServo.setSpeed(1);
         ratchetServo.setPosition(1);
-        System.out.println("yes");
     }
     public void ratchetOff(){
         ratchetServo.setPosition(0);
@@ -220,8 +219,14 @@ public class Climber extends SubsystemBase{
         climbMotor.stopMotor();
         idleClimb = true;
     }
-    public Command manualControl(BooleanSupplier up, BooleanSupplier down){
+    public Command manualControl(BooleanSupplier up, BooleanSupplier down, BooleanSupplier ratchet){
         return run(()->{
+            if (ratchet.getAsBoolean()){
+                ratchetOff();
+            }
+            else{
+                ratchetOn();
+            }
             if (up.getAsBoolean()){
                Up(); 
                System.out.print("going up");
@@ -238,18 +243,18 @@ public class Climber extends SubsystemBase{
 
     
     public void periodic(){
-        if (!idleClimb){
-            if (climbMotorDirection){
+        // if (!idleClimb){
+        //     if (climbMotorDirection){
 
-                ratchetServo.setPosition(1);
-            }
-            else{
-                ratchetServo.setPosition(0);
-            }
-        }
-        else{
-            ratchetServo.setPosition(0);
-        }
+        //         ratchetServo.setPosition(1);
+        //     }
+        //     else{
+        //         ratchetServo.setPosition(0);
+        //     }
+        // }
+        // else{
+        //     ratchetServo.setPosition(0);
+        // }
         // System.out.println(ratchetServo.getPosition());
         SmartDashboard.putNumber("Climb Position", ratchetServo.getPosition());
         // SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));

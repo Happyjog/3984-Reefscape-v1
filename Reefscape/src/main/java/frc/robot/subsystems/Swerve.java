@@ -30,6 +30,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.Swerve.Mod0;
@@ -151,8 +152,8 @@ public class Swerve extends SubsystemBase {
     Pose2d xy1 = getPose();
     Pose2d xy2 = end;
 
-    PIDController moveXController = new PIDController(2, 0, 0);
-    PIDController moveYController = new PIDController(2, 0, 0);
+    PIDController moveXController = new PIDController(1, 0, 0);
+    PIDController moveYController = new PIDController(1, 0, 0);
 
     double xDiff = xy2.getX() - xy1.getX();
     double yDiff = xy2.getY() - xy1.getY();
@@ -163,8 +164,8 @@ public class Swerve extends SubsystemBase {
       () -> {
         System.out.println("current x = " + getPose().getX());
         System.out.println(xy2.getX() - getPose().getX());
-        double xOutput = moveXController.calculate(-1*xy2.getX() + getPose().getX());
-        double yOutput = moveYController.calculate(-1*xy2.getY() + getPose().getY());
+        double xOutput = MathUtil.clamp(moveXController.calculate(-xy2.getX() + getPose().getX()), -3, 3);
+        double yOutput = MathUtil.clamp(moveYController.calculate(-xy2.getY() + getPose().getY()), -3, 3);
         drive(new Translation2d(xOutput, yOutput), 0, false, true);
 
       }
@@ -207,7 +208,6 @@ public class Swerve extends SubsystemBase {
     Rotation2d target_rotation;
     Rotation2d turn_rotation;
     double x, y;
-    System.out.println(curr_tag_in_view);
     if (curr_tag_in_view >= 0){
       System.out.println("tag update:" + preciseTargeting);
       target = layout.getTagPose((int)(curr_tag_in_view)).get();
@@ -231,7 +231,7 @@ public class Swerve extends SubsystemBase {
         output = Math.min(output, 7);
         System.out.print(output);
       
-        drive(new Translation2d(0,0), output, false, true);
+        drive(new Translation2d(0,0), output, false, false);
         
 
       }
@@ -363,6 +363,7 @@ public class Swerve extends SubsystemBase {
   }
 
   public void update_odometry_and_pose(boolean tag_update){
+    tag_update = true;
     // swerveOdometry.update(getYaw(), getPositions());
     poseEstimator.update(getYaw(), getPositions());
     

@@ -86,7 +86,7 @@ public class Elevator extends SubsystemBase{
             Constants.Elevator.elevatorShaft.kA);
         
         // Set the position to zero
-        elevatorMotorEncoder.reset();
+        // elevatorMotorEncoder.reset();
     }
 
 
@@ -128,14 +128,54 @@ public class Elevator extends SubsystemBase{
     public void reachGoal(double goal){
         double voltageOutput = MathUtils.clamp(elevatorFeedforward.calculateWithVelocities(getVelocity(), elevatorMotorProfiledPID.getSetpoint().velocity)
             + elevatorMotorProfiledPID.calculate(getPos().getDegrees(), goal), 7, -7); 
-        System.out.println(voltageOutput);
         elevatorMotor.setVoltage(voltageOutput);
         elevatorMotorWS.setVoltage(-voltageOutput);
     }
-    //PID Runner
-    public Command setHeight(double goal){
-        return run(()->{settingHeight=true; reachGoal(goal); System.out.println(getPos().getDegrees());}).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
+    public double getGoalCurr(){
+        double goal = Constants.Elevator.elevatorShaft.kLEVEL1;
+        String level = NetworkTableInstance.getDefault().getTable("ButtonBoard").getEntry("cumber").getString("");
+        if (level.equals("L3") || level.equals("R3")){
+            goal = Constants.Elevator.elevatorShaft.kLEVEL4;
+        }
+        else if (level.equals("L2")||level.equals("R2")){
+            goal = Constants.Elevator.elevatorShaft.kLEVEL3;
+
+
+        }
+        else if (level.equals("L1")||level.equals("R1")){
+            goal = Constants.Elevator.elevatorShaft.kLEVEL2;
+
+        }
+        else if (level.equals("0")){
+            goal = Constants.Elevator.elevatorShaft.kLEVEL1;
+
+        }
+        return goal;
     }
+    //PID Runner
+    public Command setHeight(){
+        return run(()->{
+            settingHeight=true; reachGoal(getGoalCurr()); 
+            System.out.println(getPos().getDegrees());
+        }).until(()->Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
+    }
+    public Command resetDown(){
+        return run(()->{
+            settingHeight=true; reachGoal(Constants.Elevator.elevatorShaft.kLEVEL1); 
+            System.out.println(getPos().getDegrees());
+        }).until(()->Math.abs(getPos().getDegrees() - Constants.Elevator.elevatorShaft.kLEVEL1) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
+    }
+    public void setHeightButREAL(){
+        System.out.println("rannnnn");
+        while (!(Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance)){
+            
+            settingHeight=true;
+            reachGoal(getGoalCurr()); 
+            System.out.println(getPos().getDegrees() - getGoalCurr());
+        }
+        settingHeight=false;
+    }
+    
 
 
     // Manual Controls:
@@ -184,11 +224,11 @@ public class Elevator extends SubsystemBase{
 
     // Periodic
     public void periodic(){
-        String s = NetworkTableInstance.getDefault().getTable("ButtonBoard").getStringTopic("cumber").toString();
+        
         // System.out.println(s);
-        if (!settingHeight){
-            setHeight(getPos().getDegrees());
-        }
+        // if (!settingHeight){
+        //     setHeight(getPos().getDegrees());
+        // }
         // If elevator has reached bottom, reset to 0 to avoid drift and stuff.
         if (!limitSwitch1.get() && !limitSwitch2.get()){
             resetPos();
