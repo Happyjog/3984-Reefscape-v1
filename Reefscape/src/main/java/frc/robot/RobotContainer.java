@@ -112,12 +112,12 @@ public class RobotContainer {
     // s_Elevator.setDefaultCommand(
     //     s_Elevator.resetDown());
     
-    // s_Climber.setDefaultCommand(
-    //   s_Climber.manualControl(
-    //   ()-> driver.leftBumper().getAsBoolean(),
-    //   ()-> driver.rightBumper().getAsBoolean(),
-    //   ()-> driver.b().getAsBoolean()
-    //   ));
+    s_Climber.setDefaultCommand(
+      s_Climber.manualControl(
+      ()-> driver.leftBumper().getAsBoolean(),
+      ()-> driver.rightBumper().getAsBoolean(),
+      ()-> driver.rightStick().getAsBoolean()
+      ));
 
     // Configure the button bindings
     configureButtonBindings();

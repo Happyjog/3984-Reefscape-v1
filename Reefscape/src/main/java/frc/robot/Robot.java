@@ -6,10 +6,15 @@ package frc.robot;
 
 //import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.config.CTREConfigs;
 import au.grapplerobotics.CanBridge;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.wpilibj.TimedRobot;
+
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -27,7 +32,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    CanBridge.runTCP();
+    // Uncomment when usbing to rio for lasercans STUPID
+    // CanBridge.runTCP();
+    CameraServer.startAutomaticCapture(new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera"));
     ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
