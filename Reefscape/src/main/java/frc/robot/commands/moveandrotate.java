@@ -48,7 +48,7 @@ public class moveandrotate extends Command{
     
     @Override
     public void initialize() {
-        isDone = false;
+        isDone = true;
         s_Swerve.togglePreciseTargeting(true);
         curr_tag_in_view = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getInteger(-1);
 
@@ -71,8 +71,8 @@ public class moveandrotate extends Command{
             System.out.println("t_dff" + diff_t + "angle tag" + tag_theta_rot + "robto angle: " + roboPose.getRotation().getDegrees());
 
         
-            double forward_offset = -0.4;
-            double lateral_offset = 0.5;
+            double forward_offset = -0.4;//-0.4;
+            double lateral_offset = 0;//0.5;
             // double x_offset = tag_x + forward_offset * tag_theta.getCos() - lateral_offset * tag_theta.getSin();
             // double y_offset = tag_y + forward_offset * tag_theta.getSin() + lateral_offset * tag_theta.getCos();
             double x_offset = tag_x + forward_offset * tag_theta.getSin() - lateral_offset * tag_theta.getCos();
@@ -110,7 +110,7 @@ public class moveandrotate extends Command{
         double xOutput = Math.min(moveXController.calculate(-1*delx), 3);
         double yOutput = Math.min(moveYController.calculate(-1*dely), 3);
         double tOutput = Math.min(moveTController.calculate(-1*delt), 3);
-        s_Swerve.drive(new Translation2d(xOutput, yOutput), tOutput, true, true);
+        // s_Swerve.drive(new Translation2d(xOutput, yOutput), tOutput, true, true);
         if (Math.abs(delx) < 0.05 && Math.abs(dely) < 0.05 && Math.abs(delt) < 5){
             isDone = true;
         }

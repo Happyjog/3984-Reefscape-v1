@@ -79,7 +79,7 @@ public class Climber extends SubsystemBase{
         climbMotor.setVoltage(voltageOutput);
     }
     public Command arise(double goal){
-        return run(()->{reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance);
+        return run(()->{reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance).andThen(()->ratchetOn());
     }
 
     /*public Command moveTo(BooleanSupplier amp, BooleanSupplier speaker, DoubleSupplier trigger){
@@ -243,6 +243,7 @@ public class Climber extends SubsystemBase{
 
     
     public void periodic(){
+        // ratchetOff();
         // if (!idleClimb){
         //     if (climbMotorDirection){
 
@@ -256,7 +257,7 @@ public class Climber extends SubsystemBase{
         //     ratchetServo.setPosition(0);
         // }
         // System.out.println(ratchetServo.getPosition());
-        SmartDashboard.putNumber("Climb Position", ratchetServo.getPosition());
+        SmartDashboard.putNumber("Climb Position", summonPosition());
         // SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));
     }
 

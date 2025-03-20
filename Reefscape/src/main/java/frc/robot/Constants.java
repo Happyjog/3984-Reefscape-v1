@@ -165,11 +165,18 @@ public final class Constants {
             public static final int shaftMotorWSID = 16;
             public static final int laserCan1ID = 17; //TODO
             public static final int laserCan2ID = 18; //TODO
-            public static final double kP = 0.003; // TODO
-            public static final double kI = 0.00009; // TODO
-            public static final double kD = 0.00001; // TODO
+            // public static final double kP = 0.003; // TODO
+            // public static final double kI = 0.00009; // TODO
+            // public static final double kD = 0.00001; // TODO
+            // public static final double kS = 0; // TODO
+            // public static final double kG = 0.1; // TODO
+            // public static final double kV = 0; // TODO
+            // public static final double kA = 0; // TODO
+            public static final double kP = 0.004; // TODO
+            public static final double kI = 0.00000; // TODO
+            public static final double kD = 0.00000; // TODO
             public static final double kS = 0; // TODO
-            public static final double kG = 0.1; // TODO
+            public static final double kG = 0; // TODO
             public static final double kV = 0; // TODO
             public static final double kA = 0; // TODO
             public static final double kMaxVelocity = 0; // TODO
@@ -180,7 +187,7 @@ public final class Constants {
             public static final double kLEVEL1 = 0; 
             public static final double kLEVEL2 = 2210;
             public static final double kLEVEL3 = 5186;
-            public static final double kLEVEL4 = 9500;
+            public static final double kLEVEL4 = 9700;
             public static final TrapezoidProfile.Constraints kElevatorConstraints = new TrapezoidProfile.Constraints(kMaxVelocity, kMaxAcceleration);
 
         }
@@ -195,13 +202,12 @@ public final class Constants {
     public static final class Climber {
         public static final int rotMotorID = 9; // climber left
         public static final double tolerance = 1.0;
-        public static final double kP = 0.01;
+        public static final double kP = 0.1;
         public static final double kI = 0;
         public static final double kD = 0;
         public static final double gearRatio = 25;
-        public static final Rotation2d[] FULLEXTENSION = new Rotation2d[] { Rotation2d.fromDegrees(-2022),
-                Rotation2d.fromDegrees(2022) };
-        public static final double kClimberOut = 151.82936096191406;
+        
+        public static final double kClimberOut = 187.02936096191406;
         public static final double kClimberIn = 0;
     }
 

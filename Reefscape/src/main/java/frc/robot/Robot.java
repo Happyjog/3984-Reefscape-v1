@@ -4,12 +4,19 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 //import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.config.CTREConfigs;
+
+import java.nio.file.attribute.AclFileAttributeView;
+import java.util.Optional;
+
 import au.grapplerobotics.CanBridge;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.HttpCamera;
@@ -34,10 +41,20 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Uncomment when usbing to rio for lasercans STUPID
     // CanBridge.runTCP();
-    CameraServer.startAutomaticCapture(new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera"));
+    // CameraServer.startAutomaticCapture(new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera"));
+    // HttpCamera httpCamera = new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera");
+    // CameraServer.getInstance().addCamera(httpCamera);
+    Shuffleboard.getTab("SmartDashboard").addCamera("outtakeCamera", "outtakeCamera", new String[]{"http://10.39.84.200:1189/elevator_camera"});
+    
+    CameraServer.startAutomaticCapture();
+    // Shuffleboard.getTab("SmartDashboard").addCamera("climberCamera", "climberCamera", new String[]{"http://10.39.84.201:1189/climber_camera"});
     ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    Alliance alliance = DriverStation.getAlliance().get();
+    if (alliance == Alliance.Blue){
+      
+    }
     m_robotContainer = new RobotContainer();
     //arm = new Arm();
   }

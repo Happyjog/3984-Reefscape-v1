@@ -156,7 +156,7 @@ public class Elevator extends SubsystemBase{
     public Command setHeight(){
         return run(()->{
             settingHeight=true; reachGoal(getGoalCurr()); 
-            System.out.println(getPos().getDegrees());
+            System.out.println(Math.abs(getPos().getDegrees() - getGoalCurr()));
         }).until(()->Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
     }
     public Command resetDown(){

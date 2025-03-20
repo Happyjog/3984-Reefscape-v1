@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -110,13 +111,13 @@ public class RobotContainer {
             () -> driver.x().getAsBoolean()));
     // TODO Remove manual control later
     // s_Elevator.setDefaultCommand(
-    //     s_Elevator.resetDown());
+    //     s_Elevator.setHeight());
     
     s_Climber.setDefaultCommand(
       s_Climber.manualControl(
       ()-> driver.leftBumper().getAsBoolean(),
       ()-> driver.rightBumper().getAsBoolean(),
-      ()-> driver.rightStick().getAsBoolean()
+      ()-> driver.x().getAsBoolean()
       ));
 
     // Configure the button bindings
@@ -135,11 +136,16 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    driver.x().onTrue(new InstantCommand(() -> s_Climber.trapOn()));
-    driver.x().onFalse(new InstantCommand(() -> s_Climber.trapOff()));
+    // driver.leftBumper().onTrue(s_Climber.arise(Constants.Climber.kClimberOut));
+    // driver.rightBumper().onTrue(s_Climber.arise(Constants.Climber.kClimberIn));
+
+    // driver.x().onTrue(new InstantCommand(() -> s_Climber.trapOn()));
+    // driver.x().onFalse(new InstantCommand(() -> s_Climber.trapOff()));
     driver.a().onTrue(new InstantCommand(() -> s_Spitter.runOutake()));
     // driver.rightBumper().onTrue(new InstantCommand(()->s_Spitter.OuttakeIn()));
-    driver.b().onTrue(MR_tag.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(()->s_Spitter.runOutake())));
+    // driver.b().onTrue(MR_tag);//.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(()->s_Spitter.runOutake())));
+    driver.b().onTrue(s_Elevator.setHeight().andThen(new InstantCommand(()->s_Spitter.runOutake())));
+
     driver.b().whileFalse(s_Elevator.resetDown());
     // driver.start().onTrue(s_Elevator.setHeight());
     // driver.a().onTrue(s_Climber.ratchetControl());
