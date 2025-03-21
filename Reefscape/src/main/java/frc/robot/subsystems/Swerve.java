@@ -22,6 +22,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
@@ -89,10 +91,12 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
     for (SwerveModule mod : mSwerveMods) {
+
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+
+  
     }
   }
-
   public void setModuleStates(ChassisSpeeds chassisSpeeds) {
     SwerveModuleState[] desiredStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);// TODO
                                                                                                               // NEED TO
@@ -101,7 +105,9 @@ public class Swerve extends SubsystemBase {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
 
     for (SwerveModule mod : mSwerveMods) {
+
       mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+      
     }
   }
 
@@ -372,7 +378,7 @@ public class Swerve extends SubsystemBase {
       boolean doRejectUpdate = false;
       
       //Pose2d tag2dpose = layout.getTagPose((int)(curr_tag_in_view)).get().toPose2d();
-      LimelightHelpers.SetRobotOrientation("limelight", poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      LimelightHelpers.SetRobotOrientation("limelight", (DriverStation.getAlliance().get() == Alliance.Red)? poseEstimator.getEstimatedPosition().getRotation().getDegrees()+180 :  poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       //field.getObject("traj").setPoses(tag2dpose);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
       if(Math.abs(-1*gyro1.getYaw().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
