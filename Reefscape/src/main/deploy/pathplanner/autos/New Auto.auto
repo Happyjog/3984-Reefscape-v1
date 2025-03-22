@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left-F"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F-CoralL"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralL-F"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "F-CoralL"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CoralL-A"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

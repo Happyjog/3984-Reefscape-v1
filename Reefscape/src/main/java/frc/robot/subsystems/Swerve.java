@@ -9,6 +9,10 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 // import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 // import com.pathplanner.lib.util.PIDConstants;
 // import com.pathplanner.lib.util.ReplanningConfig;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -79,6 +83,28 @@ public class Swerve extends SubsystemBase {
     field = new Field2d();
     NetworkTable table = NetworkTableInstance.getDefault().getTable("TODO"); //TODO
     SmartDashboard.putData("Field", field);
+    RobotConfig config;
+    try{
+      config = RobotConfig.fromGUISettings();
+      AutoBuilder.configure(
+        this::getPose, 
+        this::resetOdometry, 
+        this::getSpeeds, 
+        this::setModuleStates,
+        new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+          new PIDConstants(Constants.AutoConstants.kPXController, 0, 0),
+          new PIDConstants(Constants.AutoConstants.kPThetaController, 0, 0)
+        ), config, ()->{
+          if (DriverStation.getAlliance().isPresent()){
+              return DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
+          }
+          return false;}, this);
+    } catch (Exception e) {
+      // Handle exception as needed
+      e.printStackTrace();
+    }
+    
+    
   }
 
   public void drive(
@@ -373,15 +399,21 @@ public class Swerve extends SubsystemBase {
     // swerveOdometry.update(getYaw(), getPositions());
     poseEstimator.update(getYaw(), getPositions());
     
-    
+    int[] validIDs = {6,7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
+    LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
     if (tag_update){
       boolean doRejectUpdate = false;
       
       //Pose2d tag2dpose = layout.getTagPose((int)(curr_tag_in_view)).get().toPose2d();
-      LimelightHelpers.SetRobotOrientation("limelight", (DriverStation.getAlliance().get() == Alliance.Red)? poseEstimator.getEstimatedPosition().getRotation().getDegrees()+180 :  poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-      //field.getObject("traj").setPoses(tag2dpose);
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      if(Math.abs(-1*gyro1.getYaw().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
+
+      // Alternative, set invert the controls when red
+      LimelightHelpers.SetRobotOrientation("limelight", 
+      DriverStation.getAlliance().get() == Alliance.Red ?
+      poseEstimator.getEstimatedPosition().getRotation().getDegrees()+180 :poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      // field.getObject("traj").setPoses(tag2dpose);
+      // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      if(Math.abs(gyro1.getAngularVelocityZWorld().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
       {
         doRejectUpdate = true;
       }

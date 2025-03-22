@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
-public class WaitForCoralCommand {
+import edu.wpi.first.wpilibj2.command.Command;
+
+public class WaitForCoralCommand extends Command{
     public void WaitForCoralCommand(){
         
     }

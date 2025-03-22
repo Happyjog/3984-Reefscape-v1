@@ -68,17 +68,17 @@ public class moveandrotate extends Command{
             Rotation2d tag_theta = tag_pose.getRotation().minus(Rotation2d.fromDegrees(90));
             Rotation2d tag_theta_rot = tag_pose.getRotation().plus(Rotation2d.fromDegrees(180));
             double diff_t = roboPose.getRotation().minus(tag_theta_rot).getDegrees();
-            System.out.println("t_dff" + diff_t + "angle tag" + tag_theta_rot + "robto angle: " + roboPose.getRotation().getDegrees());
+            System.out.println("t_dff" + diff_t + "robto angle: " + diff_t);
 
         
-            double forward_offset = -0.4;//-0.4;
+            double forward_offset = 0.0;
             double lateral_offset = 0;//0.5;
             // double x_offset = tag_x + forward_offset * tag_theta.getCos() - lateral_offset * tag_theta.getSin();
             // double y_offset = tag_y + forward_offset * tag_theta.getSin() + lateral_offset * tag_theta.getCos();
             double x_offset = tag_x + forward_offset * tag_theta.getSin() - lateral_offset * tag_theta.getCos();
             double y_offset = tag_y - forward_offset * tag_theta.getCos() - lateral_offset * tag_theta.getSin();
-            double diff_x = roboPose.getX() - x_offset;
-            double diff_y = roboPose.getY() - y_offset;
+            double diff_x = roboPose.getX() - tag_x;
+            double diff_y = roboPose.getY() - tag_y;
             System.out.println("x_diff"+ diff_x + "y_dff" + diff_y + "angle" + roboPose.getRotation().minus(tag_pose.getRotation()).getDegrees());
             // s_Swerve.plots(new Pose2d(x_offset, y_offset,tag_theta));
 
@@ -109,9 +109,9 @@ public class moveandrotate extends Command{
         // Output Volts is capped at 2 to prevent brownout
         double xOutput = Math.min(moveXController.calculate(-1*delx), 3);
         double yOutput = Math.min(moveYController.calculate(-1*dely), 3);
-        double tOutput = Math.min(moveTController.calculate(-1*delt), 3);
-        // s_Swerve.drive(new Translation2d(xOutput, yOutput), tOutput, true, true);
-        if (Math.abs(delx) < 0.05 && Math.abs(dely) < 0.05 && Math.abs(delt) < 5){
+        // double tOutput = Math.min(moveTController.calculate(-1*delt), 3);
+        s_Swerve.drive(new Translation2d(xOutput, yOutput), 0, true, true);
+        if (Math.abs(delx) < 0.05 && Math.abs(dely) < 0.05 ){
             isDone = true;
         }
         else{

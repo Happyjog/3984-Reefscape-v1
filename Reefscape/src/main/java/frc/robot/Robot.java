@@ -44,9 +44,11 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture(new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera"));
     // HttpCamera httpCamera = new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera");
     // CameraServer.getInstance().addCamera(httpCamera);
-    Shuffleboard.getTab("SmartDashboard").addCamera("outtakeCamera", "outtakeCamera", new String[]{"http://10.39.84.200:1189/elevator_camera"});
+    Shuffleboard.getTab("Teleoperated").addCamera("outtakeCamera", "outtakeCamera", new String[]{"http://10.39.84.201:1189/elevator_camera"});
     
-    CameraServer.startAutomaticCapture();
+    CameraServer.startAutomaticCapture(0);
+    CameraServer.startAutomaticCapture(1);
+
     // Shuffleboard.getTab("SmartDashboard").addCamera("climberCamera", "climberCamera", new String[]{"http://10.39.84.201:1189/climber_camera"});
     ctreConfigs = new CTREConfigs();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our

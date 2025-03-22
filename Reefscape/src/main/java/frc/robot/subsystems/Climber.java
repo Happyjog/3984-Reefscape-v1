@@ -34,6 +34,7 @@ public class Climber extends SubsystemBase{
     private PWM ratchetServo;
     private boolean climbMotorDirection;
     private boolean idleClimb;
+    private boolean reachedGoal = false;
     public Climber() {
         // initialies all the variables and constants
         climbMotor = new SparkMax(frc.robot.Constants.Climber.rotMotorID, MotorType.kBrushless );
@@ -79,7 +80,7 @@ public class Climber extends SubsystemBase{
         climbMotor.setVoltage(voltageOutput);
     }
     public Command arise(double goal){
-        return run(()->{reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance).andThen(()->ratchetOn());
+        return run(()->{ reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance).andThen(()->{System.out.println("reached"); ratchetOn(); reachedGoal = true;});
     }
 
     /*public Command moveTo(BooleanSupplier amp, BooleanSupplier speaker, DoubleSupplier trigger){
@@ -162,8 +163,8 @@ public class Climber extends SubsystemBase{
         ratchetServo.setPosition(0);
     }
     public void trapOn(){
-        // trapServo.setSpeed(1);
-        trapServo.setPosition(1);
+        trapServo.setSpeed(1);
+        // trapServo.setPosition(1);
     }
     public void trapOff(){
         trapServo.setSpeed(0);
@@ -258,6 +259,7 @@ public class Climber extends SubsystemBase{
         // }
         // System.out.println(ratchetServo.getPosition());
         SmartDashboard.putNumber("Climb Position", summonPosition());
+        SmartDashboard.putBoolean("Climb reach setpoint?", atSetpoint);
         // SmartDashboard.putBoolean("Ratchet Locked?", ratchetControl(()->SmartDashboard.getBoolean("Ratchet Locked?", true)));
     }
 

@@ -21,9 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.WaitForCoralCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.moveToOffset;
 import frc.robot.commands.moveToRotation;
 import frc.robot.commands.moveandrotate;
@@ -90,7 +92,10 @@ public class RobotContainer {
     // NamedCommands.registerCommand("ScoreL4", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
     // NamedCommands.registerCommand("ScoreL3", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
     // NamedCommands.registerCommand("ScoreL2", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
-    // NamedCommands.registerCommand("ScoreL1", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
+    NamedCommands.registerCommand("CoralIntake", new InstantCommand(()->s_Spitter.runOutake()).andThen(new WaitCommand(5)));
+
+    // NamedCommands.registerCommand("ScoreL1", s_Elevator.setHeightPos(elevatorShaft.kLEVEL2).andThen(new InstantCommand(()->s_Spitter.runOutake())).andThen(new WaitCommand(2)).andThen(null));
+    NamedCommands.registerCommand("ScoreL4", s_Elevator.setHeightPos(elevatorShaft.kLEVEL4).andThen(new InstantCommand(()->s_Spitter.runOutake())).andThen(new WaitCommand(2)));
 
     // NamedCommands.registerCommand("ScoreR4", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
     // NamedCommands.registerCommand("ScoreR3", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
@@ -109,6 +114,7 @@ public class RobotContainer {
             () -> false,
             () -> driver.leftBumper().getAsBoolean(),
             () -> driver.x().getAsBoolean()));
+
     // TODO Remove manual control later
     // s_Elevator.setDefaultCommand(
     //     s_Elevator.setHeight());
@@ -147,6 +153,11 @@ public class RobotContainer {
     driver.b().onTrue(s_Elevator.setHeight().andThen(new InstantCommand(()->s_Spitter.runOutake())));
 
     driver.b().whileFalse(s_Elevator.resetDown());
+
+    driver.rightTrigger().whileTrue(new InstantCommand(()->s_Climber.trapOn()));
+    driver.rightTrigger().whileFalse(new InstantCommand(()->s_Climber.trapOff()));
+    driver.povUp().onTrue(new InstantCommand(()->s_Climber.ratchetOff()).andThen(new WaitCommand(1)).andThen(s_Climber.arise(Constants.Climber.kClimberOut)));
+    driver.leftTrigger().onTrue(new InstantCommand(()->s_Climber.ratchetOff()).andThen(s_Climber.arise(Constants.Climber.kClimberIn)).andThen(new InstantCommand(()->s_Climber.ratchetOn())));
     // driver.start().onTrue(s_Elevator.setHeight());
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
@@ -170,26 +181,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new InstantCommand();//autoChooser.getSelected();
+    return new PathPlannerAuto("moveAuto");//autoChooser.getSelected();
   }
-  // public Command testPath(){return new PathPlannerAuto("testAuto");}
-  // // Left side autos
-  // public Command Left1Note(){return new PathPlannerAuto("Left1Note");}
-  // public Command Left2Note(){return new PathPlannerAuto("Left2Note");}
-  // //public Command Left3Note(){return new PathPlannerAuto("Left3Note");}
-  // //public Command Left3NoteFar(){return new PathPlannerAuto("Left3NoteFar");}
-  // //public Command Left4Note(){return new PathPlannerAuto("Left4Note");}
-  // // Mid side autos
-  // public Command Mid1Note(){return new PathPlannerAuto("Mid1Note");}
-  // public Command Mid2Note(){return new PathPlannerAuto("Mid2Note");}
-  // //public Command Mid3NoteFar(){return new PathPlannerAuto("Mid3NoteFar");}
-  // //public Command Mid4Note(){return new PathPlannerAuto("Mid4Note");}
-  // //public Command MidLeft3Note(){return new PathPlannerAuto("MidLeft3Note");}
-  // //public Command MidRight3Note(){return new
-  // PathPlannerAuto("MidRight3Note");}
-  // //Right side autos
-  // public Command Right1Note(){return new PathPlannerAuto("Right1Note");}
-  // public Command Right2Note(){return new PathPlannerAuto("Right2Note");}
-  // public Command Right2NoteFar(){return new PathPlannerAuto("Right2NoteFar");}
-  // public Command Right3NoteFar(){return new PathPlannerAuto("Right3NoteFar");}
 }

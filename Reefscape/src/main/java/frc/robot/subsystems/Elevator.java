@@ -159,6 +159,13 @@ public class Elevator extends SubsystemBase{
             System.out.println(Math.abs(getPos().getDegrees() - getGoalCurr()));
         }).until(()->Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
     }
+    public Command setHeightPos(double goal){
+        return run(()->{
+            settingHeight=true; reachGoal(goal); 
+            System.out.println(getPos().getDegrees());
+        }).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
+    }
+    
     public Command resetDown(){
         return run(()->{
             settingHeight=true; reachGoal(Constants.Elevator.elevatorShaft.kLEVEL1); 
