@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 //import com.pathplanner.lib.server.PathPlannerServer;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardContainer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -37,6 +38,7 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  Timer gcTimer = new Timer();
   @Override
   public void robotInit() {
     // Uncomment when usbing to rio for lasercans STUPID
@@ -44,13 +46,14 @@ public class Robot extends TimedRobot {
     // CameraServer.startAutomaticCapture(new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera"));
     // HttpCamera httpCamera = new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera");
     // CameraServer.getInstance().addCamera(httpCamera);
-    Shuffleboard.getTab("Teleoperated").addCamera("outtakeCamera", "outtakeCamera", new String[]{"http://10.39.84.201:1189/elevator_camera"});
+    // Shuffleboard.getTab("Teleoperated").addCamera("outtakeCamera", "outtakeCamera", new String[]{"http://ubuntu.lan:1189/elevator_camera"});
     
-    CameraServer.startAutomaticCapture(0);
-    CameraServer.startAutomaticCapture(1);
+    //CameraServer.startAutomaticCapture(0);
+    // CameraServer.startAutomaticCapture(1);
 
     // Shuffleboard.getTab("SmartDashboard").addCamera("climberCamera", "climberCamera", new String[]{"http://10.39.84.201:1189/climber_camera"});
     ctreConfigs = new CTREConfigs();
+    gcTimer.start();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     Alliance alliance = DriverStation.getAlliance().get();
@@ -68,6 +71,7 @@ public class Robot extends TimedRobot {
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
    */
+  
   @Override
   public void robotPeriodic() {
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
@@ -75,6 +79,9 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    if (gcTimer.advanceIfElapsed(5)){
+      System.gc();
+    }
   }
 
   /** This function is called once each time the robot enters Disabled mode. */

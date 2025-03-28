@@ -72,6 +72,8 @@ public class Swerve extends SubsystemBase {
     };
     // swerveOdometry = new SwerveDriveOdometry(Constants.Swerve.swerveKinematics, getYaw(), getPositions());
     poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getYaw(), getPositions(), new Pose2d());
+    poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
+
     preciseTargeting = false;
     try {
       layout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
@@ -390,7 +392,12 @@ public class Swerve extends SubsystemBase {
   }
 
   public Rotation2d getYaw() {
-    return Rotation2d.fromDegrees(-1*gyro1.getYaw().getValueAsDouble() * (Constants.Swerve.invertGyro ? 1 : -1));
+    if (DriverStation.getAlliance().get() == Alliance.Red){
+      return Rotation2d.fromDegrees(-1*(gyro1.getYaw().getValueAsDouble()+180) * (Constants.Swerve.invertGyro ? 1 : -1));
+    }
+    else{
+      return Rotation2d.fromDegrees(-1*gyro1.getYaw().getValueAsDouble() * (Constants.Swerve.invertGyro ? 1 : -1));
+    }
 
   }
 
@@ -400,7 +407,7 @@ public class Swerve extends SubsystemBase {
     poseEstimator.update(getYaw(), getPositions());
     
     int[] validIDs = {6,7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22};
-    LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
+    // LimelightHelpers.SetFiducialIDFiltersOverride("limelight", validIDs);
     if (tag_update){
       boolean doRejectUpdate = false;
       
@@ -409,10 +416,10 @@ public class Swerve extends SubsystemBase {
       // Alternative, set invert the controls when red
       LimelightHelpers.SetRobotOrientation("limelight", 
       DriverStation.getAlliance().get() == Alliance.Red ?
-      poseEstimator.getEstimatedPosition().getRotation().getDegrees()+180 :poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      poseEstimator.getEstimatedPosition().getRotation().getDegrees() + 180:poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       // field.getObject("traj").setPoses(tag2dpose);
-      // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
-      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+      LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
+      // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
       if(Math.abs(gyro1.getAngularVelocityZWorld().getValueAsDouble()) > 720) // if our angular velocity is greater than 720 degrees per second, ignore vision updates
       {
         doRejectUpdate = true;
@@ -423,7 +430,6 @@ public class Swerve extends SubsystemBase {
       }
       if(!doRejectUpdate)
       {
-        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.7,.7,9999999));
         poseEstimator.addVisionMeasurement(
             mt2.pose,
             mt2.timestampSeconds);
@@ -453,19 +459,19 @@ public class Swerve extends SubsystemBase {
     //   }
     // }
     // System.out.println(getPose())
-    curr_tag_in_view = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getInteger(-1);
-    is_tag_present = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getInteger(0);
+    // curr_tag_in_view = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tid").getInteger(-1);
+    // is_tag_present = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tv").getInteger(0);
     // System.out.println(curr_tag_in_view);
     field.setRobotPose(getPose());
 
-    for (SwerveModule mod : mSwerveMods) {
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
-      SmartDashboard.putNumber(
-          "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
-      SmartDashboard.putNumber("Mod" + mod.moduleNumber + " DrivePos", mod.getPosets());
-    }
+    // for (SwerveModule mod : mSwerveMods) {
+    //   SmartDashboard.putNumber(
+    //       "Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+    //   SmartDashboard.putNumber(
+    //       "Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
+    //   SmartDashboard.putNumber(
+    //       "Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);
+    //   SmartDashboard.putNumber("Mod" + mod.moduleNumber + " DrivePos", mod.getPosets());
+    // }
   }
 }

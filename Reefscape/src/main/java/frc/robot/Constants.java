@@ -34,12 +34,12 @@ public final class Constants {
         public static final boolean invertGyro = false;// false
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.73);
+        public static final double trackWidth = Units.inchesToMeters(23.5);
         public static final Translation2d f1ModuleOffset = new Translation2d(trackWidth / 2, trackWidth / 2);
         public static final Translation2d f2ModuleOffset = new Translation2d(trackWidth / 2, -trackWidth / 2);
         public static final Translation2d b1ModuleOffset = new Translation2d(-trackWidth / 2, trackWidth / 2);
         public static final Translation2d b2ModuleOffset = new Translation2d(-trackWidth / 2, -trackWidth / 2);
-        public static final double wheelBase = Units.inchesToMeters(21.73);
+        public static final double wheelBase = Units.inchesToMeters(23.5);
         public static final double wheelDiameter = Units.inchesToMeters(4.0);
         public static final double wheelCircumference = wheelDiameter * Math.PI;
 
@@ -165,23 +165,26 @@ public final class Constants {
             public static final int shaftMotorWSID = 16;
             public static final int laserCan1ID = 17; //TODO
             public static final int laserCan2ID = 18; //TODO
-            // public static final double kP = 0.003; // TODO
-            // public static final double kI = 0.00009; // TODO
-            // public static final double kD = 0.00001; // TODO
+            // Old vals
+            // public static final double kP = 0.008; // 0.004
+            // public static final double kI = 0.00000; // TODO
+            // public static final double kD = 0.00000; // TODO
             // public static final double kS = 0; // TODO
-            // public static final double kG = 0.1; // TODO
+            // public static final double kG = 0; // TODO
             // public static final double kV = 0; // TODO
             // public static final double kA = 0; // TODO
-            public static final double kP = 0.008; // 0.004
+
+            public static final double kP =  0.01;
             public static final double kI = 0.00000; // TODO
             public static final double kD = 0.00000; // TODO
             public static final double kS = 0; // TODO
-            public static final double kG = 0; // TODO
-            public static final double kV = 0; // TODO
-            public static final double kA = 0; // TODO
-            public static final double kMaxVelocity = 0; // TODO
-            public static final double kMaxAcceleration = 0; // TODO
-            public static final double kElevatorMotorRampRate = 0.2; 
+            public static final double kG = 0.36*0.8; // TODO
+            public static final double kV = 0.001;//1.7; // TODO
+            public static final double kA = 0.0; // TODO
+
+            public static final double kMaxVelocity = 0.5; // TODO
+            public static final double kMaxAcceleration = 0.5; // TODO
+            public static final double kElevatorMotorRampRate = 0.05; 
             public static final double kErrorTolerance = 100;
             public static final double kFULLEXTENSION = -2022; // TODO
             public static final double kLEVEL1 = 0; 

@@ -80,7 +80,7 @@ public class Climber extends SubsystemBase{
         climbMotor.setVoltage(voltageOutput);
     }
     public Command arise(double goal){
-        return run(()->{ reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance).andThen(()->{System.out.println("reached"); ratchetOn(); reachedGoal = true;});
+        return run(()->{ reachGoal(goal);}).until(()->Math.abs(summonPosition() - goal) < Constants.Climber.tolerance).andThen(()->{ ratchetOn(); reachedGoal = true;});
     }
 
     /*public Command moveTo(BooleanSupplier amp, BooleanSupplier speaker, DoubleSupplier trigger){

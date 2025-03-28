@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 
 import java.util.function.BooleanSupplier;
@@ -13,7 +14,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import au.grapplerobotics.LaserCan;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -37,6 +38,7 @@ public class Elevator extends SubsystemBase{
     private DigitalInput limitSwitch2;
     
     private Encoder elevatorMotorEncoder;
+    private DutyCycleEncoder absElevator;
     // private RelativeEncoder elevatorMotorEncoder;
     // private SparkClosedLoopController elevatorMotorPID;
     // private SparkClosedLoopController elevatorMotorWSPID;
@@ -70,6 +72,7 @@ public class Elevator extends SubsystemBase{
         elevatorMotorConfig.smartCurrentLimit(40).closedLoopRampRate(Constants.Elevator.elevatorShaft.kElevatorMotorRampRate);
         elevatorMotorWS.configure(elevatorMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         elevatorMotorEncoder = new Encoder(Constants.Swerve.throBoreRelativeChannel1, Constants.Swerve.throBoreRelativeChannel2);
+        absElevator = new DutyCycleEncoder(Constants.Swerve.throBoreAbsoluteChannel);
         elevatorMotorPID = new PIDController(
             Constants.Elevator.elevatorShaft.kP, 
             Constants.Elevator.elevatorShaft.kI, 
@@ -127,7 +130,8 @@ public class Elevator extends SubsystemBase{
     // Profiled PID Control + ff
     public void reachGoal(double goal){
         double voltageOutput = MathUtils.clamp(elevatorFeedforward.calculateWithVelocities(getVelocity(), elevatorMotorProfiledPID.getSetpoint().velocity)
-            + elevatorMotorProfiledPID.calculate(getPos().getDegrees(), goal), 7, -7); 
+            + elevatorMotorProfiledPID.calculate(getPos().getDegrees()- goal), 7, -7); 
+        System.out.println("HEY GUYS LOOK AT THIS: " + getPos().getDegrees() +" "+ goal + " " + elevatorMotorProfiledPID.calculate(getPos().getDegrees()- goal));
         elevatorMotor.setVoltage(voltageOutput);
         elevatorMotorWS.setVoltage(-voltageOutput);
     }
@@ -161,24 +165,23 @@ public class Elevator extends SubsystemBase{
     }
     public Command setHeightPos(double goal){
         return run(()->{
-            settingHeight=true; reachGoal(goal); 
-            System.out.println(getPos().getDegrees());
+            // settingHeight=true; reachGoal(goal); 
+            // System.out.println(getPos().getDegrees());
         }).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
     }
-    
     public Command resetDown(){
         return run(()->{
             settingHeight=true; reachGoal(Constants.Elevator.elevatorShaft.kLEVEL1); 
-            System.out.println(getPos().getDegrees());
+            // System.out.println(getPos().getDegrees());
         }).until(()->Math.abs(getPos().getDegrees() - Constants.Elevator.elevatorShaft.kLEVEL1) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
     }
     public void setHeightButREAL(){
-        System.out.println("rannnnn");
+        // System.out.println("rannnnn");
         while (!(Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance)){
             
             settingHeight=true;
             reachGoal(getGoalCurr()); 
-            System.out.println(getPos().getDegrees() - getGoalCurr());
+            // System.out.println(getPos().getDegrees() - getGoalCurr());
         }
         settingHeight=false;
     }
@@ -202,7 +205,7 @@ public class Elevator extends SubsystemBase{
         return run(()->{
             if (up.getAsBoolean()){
             ShaftUp(); 
-            System.out.print("going up");
+            // System.out.print("going up");
             }
             else if (down.getAsBoolean()){
                 ShaftDown();
@@ -242,5 +245,6 @@ public class Elevator extends SubsystemBase{
         }
         // System.out.println(getPos().getDegrees());
         SmartDashboard.putNumber("Shaft pos", getPos().getDegrees());
+        SmartDashboard.putNumber("Abs Shaft pos", absElevator.get());
     }
 }

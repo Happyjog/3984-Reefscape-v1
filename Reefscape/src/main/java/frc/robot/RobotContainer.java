@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.TeleopSwerve;
 import frc.robot.commands.WaitForCoralCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -79,7 +81,14 @@ public class RobotContainer {
   private final moveToOffset movetotag = new moveToOffset(s_Swerve, s_Swerve::getPose);
   private final moveToRotation moveToTagR = new moveToRotation(s_Swerve, s_Swerve::getPose);
   private final moveandrotate MR_tag = new moveandrotate(s_Swerve, s_Elevator, s_Swerve::getPose);
-
+  private final Trigger yButton = driver.y();
+  private final Trigger aButton = driver.a();
+  private final Trigger bButton = driver.b();
+  private final Trigger backButton = driver.back(); // Assuming `back` is already defined
+  private final Trigger start = driver.start();
+  private final Trigger rightTrigger = driver.rightTrigger();
+  private final Trigger leftTrigger = driver.leftTrigger();
+  private final Trigger povUp = driver.povUp();
   // TODO Add offsets
   private final moveToOffset moveL = new moveToOffset(s_Swerve, s_Swerve::getPose);
   private final moveToOffset moveR = new moveToOffset(s_Swerve, s_Swerve::getPose);
@@ -87,20 +96,33 @@ public class RobotContainer {
   /* The container for the robot. subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Pathplanner commands
-    // NamedCommands.registerCommand("WaitForCoral", s_Spitter.WaitForCoralCommand());
+    // NamedCommands.registerCommand("WaitForCoral",
+    // s_Spitter.WaitForCoralCommand());
 
-    // NamedCommands.registerCommand("ScoreL4", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
-    // NamedCommands.registerCommand("ScoreL3", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
-    // NamedCommands.registerCommand("ScoreL2", moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
-    NamedCommands.registerCommand("CoralIntake", new InstantCommand(()->s_Spitter.runOutake()).andThen(new WaitCommand(5)));
+    // NamedCommands.registerCommand("ScoreL4",
+    // moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
+    // NamedCommands.registerCommand("ScoreL3",
+    // moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
+    // NamedCommands.registerCommand("ScoreL2",
+    // moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
+    NamedCommands.registerCommand("CoralIntake",
+        new InstantCommand(() -> s_Spitter.runOutake()).andThen(new WaitCommand(5)));
 
-    // NamedCommands.registerCommand("ScoreL1", s_Elevator.setHeightPos(elevatorShaft.kLEVEL2).andThen(new InstantCommand(()->s_Spitter.runOutake())).andThen(new WaitCommand(2)).andThen(null));
-    NamedCommands.registerCommand("ScoreL4", s_Elevator.setHeightPos(elevatorShaft.kLEVEL4).andThen(new InstantCommand(()->s_Spitter.runOutake())).andThen(new WaitCommand(2)));
+    // NamedCommands.registerCommand("ScoreL1",
+    // s_Elevator.setHeightPos(elevatorShaft.kLEVEL2).andThen(new
+    // InstantCommand(()->s_Spitter.runOutake())).andThen(new
+    // WaitCommand(2)).andThen(null));
+    NamedCommands.registerCommand("ScoreL1", s_Elevator.setHeightPos(elevatorShaft.kLEVEL2)
+        .andThen(new InstantCommand(() -> s_Spitter.runOutake())).andThen(new WaitCommand(2)));
 
-    // NamedCommands.registerCommand("ScoreR4", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
-    // NamedCommands.registerCommand("ScoreR3", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
-    // NamedCommands.registerCommand("ScoreR2", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
-    // NamedCommands.registerCommand("ScoreR1", moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
+    // NamedCommands.registerCommand("ScoreR4",
+    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
+    // NamedCommands.registerCommand("ScoreR3",
+    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
+    // NamedCommands.registerCommand("ScoreR2",
+    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
+    // NamedCommands.registerCommand("ScoreR1",
+    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
 
     // autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
@@ -116,15 +138,16 @@ public class RobotContainer {
             () -> driver.x().getAsBoolean()));
 
     // TODO Remove manual control later
-    // s_Elevator.setDefaultCommand(
-    //     s_Elevator.setHeight());
-    
-    s_Climber.setDefaultCommand(
-      s_Climber.manualControl(
-      ()-> driver.leftBumper().getAsBoolean(),
-      ()-> driver.rightBumper().getAsBoolean(),
-      ()-> driver.x().getAsBoolean()
-      ));
+    s_Elevator.setDefaultCommand(
+        s_Elevator.manualShaftControl(() -> driver.leftBumper().getAsBoolean(),
+            () -> driver.rightBumper().getAsBoolean()));
+
+    // s_Climber.setDefaultCommand(
+    // s_Climber.manualControl(
+    // ()-> driver.leftBumper().getAsBoolean(),
+    // ()-> driver.rightBumper().getAsBoolean(),
+    // ()-> driver.x().getAsBoolean()
+    // ));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -141,27 +164,32 @@ public class RobotContainer {
    */
 
   private void configureButtonBindings() {
-    driver.y().onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    // driver.leftBumper().onTrue(s_Climber.arise(Constants.Climber.kClimberOut));
-    // driver.rightBumper().onTrue(s_Climber.arise(Constants.Climber.kClimberIn));
+    yButton.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    // leftBumper.onTrue(s_Climber.arise(Constants.Climber.kClimberOut));
+    // rightBumper.onTrue(s_Climber.arise(Constants.Climber.kClimberIn));
 
-    // driver.x().onTrue(new InstantCommand(() -> s_Climber.trapOn()));
-    // driver.x().onFalse(new InstantCommand(() -> s_Climber.trapOff()));
-    driver.a().onTrue(new InstantCommand(() -> s_Spitter.runOutake()));
-    // driver.rightBumper().onTrue(new InstantCommand(()->s_Spitter.OuttakeIn()));
-    // driver.b().onTrue(MR_tag);//.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(()->s_Spitter.runOutake())));
-    driver.b().onTrue(s_Elevator.setHeight().andThen(new InstantCommand(()->s_Spitter.runOutake())));
+    // xButton.onTrue(new InstantCommand(() -> s_Climber.trapOn()));
+    // xButton.onFalse(new InstantCommand(() -> s_Climber.trapOff()));
+    aButton.onTrue(new InstantCommand(() -> s_Spitter.runOutake()));
+    // rightBumper.onTrue(new InstantCommand(() -> s_Spitter.OuttakeIn()));
+    bButton.onTrue(s_Elevator.setHeight());
+    backButton.onTrue(new InstantCommand(() -> System.out.println("Baka!")));
 
-    driver.b().whileFalse(s_Elevator.resetDown());
+    rightTrigger.whileTrue(new InstantCommand(() -> s_Climber.trapOn()));
+    rightTrigger.whileFalse(new InstantCommand(() -> s_Climber.trapOff()));
+    povUp.onTrue(new InstantCommand(() -> s_Climber.ratchetOff())
+        .andThen(new WaitCommand(1))
+        .andThen(s_Climber.arise(Constants.Climber.kClimberOut)));
+    leftTrigger.onTrue(new InstantCommand(() -> s_Climber.ratchetOff())
+        .andThen(s_Climber.arise(Constants.Climber.kClimberIn))
+        .andThen(new InstantCommand(() -> s_Climber.ratchetOn())));
 
-    driver.rightTrigger().whileTrue(new InstantCommand(()->s_Climber.trapOn()));
-    driver.rightTrigger().whileFalse(new InstantCommand(()->s_Climber.trapOff()));
-    driver.povUp().onTrue(new InstantCommand(()->s_Climber.ratchetOff()).andThen(new WaitCommand(1)).andThen(s_Climber.arise(Constants.Climber.kClimberOut)));
-    driver.leftTrigger().onTrue(new InstantCommand(()->s_Climber.ratchetOff()).andThen(s_Climber.arise(Constants.Climber.kClimberIn)).andThen(new InstantCommand(()->s_Climber.ratchetOn())));
     // driver.start().onTrue(s_Elevator.setHeight());
     // driver.a().onTrue(s_Climber.ratchetControl());
     // driver.b().onTrue(translateApriltag);
-    // driver.b().onTrue(s_Swerve.moveTo(new Pose2d(s_Swerve.getPose().getX()+1,s_Swerve.getPose().getY(), s_Swerve.getPose().getRotation())));
+    // driver.b().onTrue(s_Swerve.moveTo(new
+    // Pose2d(s_Swerve.getPose().getX()+1,s_Swerve.getPose().getY(),
+    // s_Swerve.getPose().getRotation())));
     // driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
     // second.rightTrigger(0.3).whileTrue(intake.Out());
     // second.leftTrigger(0.3).whileTrue(fwheel.moveTo(flywheel.SPEAKER,
@@ -181,6 +209,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("moveAuto");//autoChooser.getSelected();
+    return new PathPlannerAuto("LeftA");// autoChooser.getSelected();
   }
 }
