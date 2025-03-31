@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.moveToOffset;
 import frc.robot.commands.moveToRotation;
 import frc.robot.commands.moveandrotate;
+import frc.robot.commands.moveandrotateblue;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Climber;
@@ -112,8 +113,8 @@ public class RobotContainer {
     // s_Elevator.setHeightPos(elevatorShaft.kLEVEL2).andThen(new
     // InstantCommand(()->s_Spitter.runOutake())).andThen(new
     // WaitCommand(2)).andThen(null));
-    NamedCommands.registerCommand("ScoreL1", s_Elevator.setHeightPos(elevatorShaft.kLEVEL2)
-        .andThen(new InstantCommand(() -> s_Spitter.runOutake())).andThen(new WaitCommand(2)));
+    NamedCommands.registerCommand("ScoreL4", s_Elevator.setHeightPos(elevatorShaft.kLEVEL4)
+        .andThen(new InstantCommand(() -> s_Spitter.runOutake())).andThen(new WaitCommand(2)).andThen(s_Elevator.resetDown()));
 
     // NamedCommands.registerCommand("ScoreR4",
     // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
@@ -172,7 +173,9 @@ public class RobotContainer {
     // xButton.onFalse(new InstantCommand(() -> s_Climber.trapOff()));
     aButton.onTrue(new InstantCommand(() -> s_Spitter.runOutake()));
     // rightBumper.onTrue(new InstantCommand(() -> s_Spitter.OuttakeIn()));
-    bButton.onTrue(s_Elevator.setHeight());
+    // bButton.onTrue(s_Elevator.setHeight());
+    bButton.whileTrue(MR_tag.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(() -> s_Spitter.runOutake())));
+    bButton.whileFalse(s_Elevator.resetDown());
     backButton.onTrue(new InstantCommand(() -> System.out.println("Baka!")));
 
     rightTrigger.whileTrue(new InstantCommand(() -> s_Climber.trapOn()));
@@ -209,6 +212,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("LeftA");// autoChooser.getSelected();
+    return new PathPlannerAuto("MAuto");// autoChooser.getSelected();
   }
 }

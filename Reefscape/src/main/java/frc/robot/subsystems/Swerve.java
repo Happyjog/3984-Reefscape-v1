@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
@@ -26,6 +27,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -400,7 +403,13 @@ public class Swerve extends SubsystemBase {
     }
 
   }
-
+  public void point_graph(double x, double y){
+    field.getObject("traj").setTrajectory(
+      TrajectoryGenerator.generateTrajectory(
+        List.of(new Pose2d(x, y, Rotation2d.fromDegrees(0))), 
+        new TrajectoryConfig(0, 0))
+        );
+  }
   public void update_odometry_and_pose(boolean tag_update){
     tag_update = true;
     // swerveOdometry.update(getYaw(), getPositions());
@@ -416,7 +425,7 @@ public class Swerve extends SubsystemBase {
       // Alternative, set invert the controls when red
       LimelightHelpers.SetRobotOrientation("limelight", 
       DriverStation.getAlliance().get() == Alliance.Red ?
-      poseEstimator.getEstimatedPosition().getRotation().getDegrees() + 180:poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+      poseEstimator.getEstimatedPosition().getRotation().getDegrees() :poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
       // field.getObject("traj").setPoses(tag2dpose);
       LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
       // LimelightHelpers.PoseEstimate mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");

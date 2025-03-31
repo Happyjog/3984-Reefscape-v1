@@ -15,6 +15,12 @@
           "data": {
             "pathName": "testPath1"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreL4"
+          }
         }
       ]
     }

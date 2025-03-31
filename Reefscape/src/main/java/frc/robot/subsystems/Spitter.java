@@ -33,8 +33,8 @@ public class Spitter extends SubsystemBase {
     private boolean coralPosessed = false;
     
     public Spitter() {
-        laser1 = new LaserCan(18);     
-        laser2 = new LaserCan(17);    
+        laser1 = new LaserCan(17);     
+        laser2 = new LaserCan(18);    
         outtakeMotor = new SparkMax(
                 Constants.Outtake.outtakeMotorID,
                 MotorType.kBrushed);
@@ -61,33 +61,33 @@ public class Spitter extends SubsystemBase {
         
         else if(curr_state.equals(states[1])){
             curr_state = states[2];
-            outtakeMotorWS.set(.6);
-            outtakeMotor.set(-.6);
+            outtakeMotorWS.set(.4);
+            outtakeMotor.set(-.4);
         }
         
     }
     public void OuttakeOut() {
 
         if (coralPosessed){
-            outtakeMotorWS.set(.5);
-            outtakeMotor.set(-.5);
+            outtakeMotorWS.set(.1);
+            outtakeMotor.set(-.1);
         }
         else if (!coralPosessed){
             if (laser2.getMeasurement().distance_mm < 200){
-                outtakeMotorWS.set(.35);
-                outtakeMotor.set(-.35);
+                outtakeMotorWS.set(0.1);//.35);
+                outtakeMotor.set(-0.1);//.35);
             }
             else{
-                outtakeMotorWS.set(.45);
-                outtakeMotor.set(-.45);
+                outtakeMotorWS.set(0.1);//.45);
+                outtakeMotor.set(-0.1);//-.45);
             }
         }
             
     }
 
     public void OuttakeIn() {
-        outtakeMotor.set(.6);
-        outtakeMotorWS.set(-.6);
+        outtakeMotor.set(.1);
+        outtakeMotorWS.set(-.1);
     }
 
     public void OuttakeStopManual() {

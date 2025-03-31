@@ -18,7 +18,7 @@ import frc.robot.Constants;
 import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.*;
 
-public class moveandrotate extends Command{
+public class moveandrotateblue extends Command{
     private final Swerve s_Swerve;
     private final Elevator s_Elevator;
     private final Supplier<Pose2d> poseProvider;
@@ -33,7 +33,7 @@ public class moveandrotate extends Command{
     private double thetaGoal;
 
     private long curr_tag_in_view;
-    public moveandrotate(
+    public moveandrotateblue(
         Swerve s_Swerve,
         Elevator s_Elevator,
         Supplier<Pose2d> poseProvider) {
@@ -118,8 +118,8 @@ public class moveandrotate extends Command{
         double delt = s_Swerve.optimizeAngle(Rotation2d.fromDegrees(robotPose2d.getRotation().getDegrees()), Rotation2d.fromDegrees(thetaGoal));//thetaGoal - robotPose2d.getRotation().getDegrees();
         System.out.println("ID: "+ curr_tag_in_view + " diff x: " + delx + " diff y: " + dely + "diff t: " + delt);
         // Output Volts is capped at 2 to prevent brownout
-        double xOutput = Math.min(moveXController.calculate(delx), 3);
-        double yOutput = Math.min(moveYController.calculate(dely), 3);
+        double xOutput = Math.min(moveXController.calculate(-1*delx), 3);
+        double yOutput = Math.min(moveYController.calculate(-1*dely), 3);
         double tOutput = Math.min(moveTController.calculate(-1*delt), 3);
         s_Swerve.drive(new Translation2d(xOutput, yOutput), tOutput, true, true);
         if (Math.abs(delx) < 0.1 && Math.abs(dely) < 0.1 && Math.abs(delt)<2 ){
