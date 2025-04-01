@@ -83,24 +83,15 @@ public class moveandrotateblue extends Command{
             else{
                 o = 0;
             }
-            double lateral_offset = o;//0.5;
-            // double x_offset = tag_x + forward_offset * tag_theta.getCos() - lateral_offset * tag_theta.getSin();
-            // double y_offset = tag_y + forward_offset * tag_theta.getSin() + lateral_offset * tag_theta.getCos();
+            double lateral_offset = o;
             double x_offset = tag_x + forward_offset * tag_theta.getSin() - lateral_offset * tag_theta.getCos();
             double y_offset = tag_y - forward_offset * tag_theta.getCos() - lateral_offset * tag_theta.getSin();
             double diff_x = roboPose.getX() - tag_x;
             double diff_y = roboPose.getY() - tag_y;
             System.out.println("x_diff"+ diff_x + "y_dff" + diff_y + "angle" + roboPose.getRotation().minus(tag_theta_rot).getDegrees());
-            // s_Swerve.plots(new Pose2d(x_offset, y_offset,tag_theta));
-
-            // System.out.println("HEEEYEEYYEYEYE: " + diff_x + "and"+ diff_y)
             x = x_offset;
             y = y_offset;
-            thetaGoal = tag_theta_rot.getDegrees();//+5;
-
-            // x = tag_pose.getX();
-            // y = tag_pose.getY();
-
+            thetaGoal = tag_theta_rot.getDegrees();
         }
         
     }
@@ -115,7 +106,7 @@ public class moveandrotateblue extends Command{
         }
         double delx = x - robotPose2d.getX();
         double dely = y - robotPose2d.getY();
-        double delt = s_Swerve.optimizeAngle(Rotation2d.fromDegrees(robotPose2d.getRotation().getDegrees()), Rotation2d.fromDegrees(thetaGoal));//thetaGoal - robotPose2d.getRotation().getDegrees();
+        double delt = s_Swerve.optimizeAngle(Rotation2d.fromDegrees(robotPose2d.getRotation().getDegrees()), Rotation2d.fromDegrees(thetaGoal));
         System.out.println("ID: "+ curr_tag_in_view + " diff x: " + delx + " diff y: " + dely + "diff t: " + delt);
         // Output Volts is capped at 2 to prevent brownout
         double xOutput = Math.min(moveXController.calculate(-1*delx), 3);
@@ -137,7 +128,6 @@ public class moveandrotateblue extends Command{
     @Override
     public void end(boolean interrupted) {
         System.out.println("DONE");
-        // s_Elevator.setHeightButREAL();
         s_Swerve.stop();
         
     }

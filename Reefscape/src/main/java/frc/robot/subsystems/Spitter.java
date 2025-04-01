@@ -109,21 +109,11 @@ public class Spitter extends SubsystemBase {
 
     }
 
-    public boolean checklaser1(){
-        if (laser1.getMeasurement() != null){
-            return laser1.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali1;
-        }
-        else{
-            return false;
-        }
+    public boolean checklaserFront(){
+        return laser1.getMeasurement().distance_mm < 100;
     }
-    public boolean checklaser2(){
-        if (laser2.getMeasurement() != null){
-            return laser2.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali2;
-        }
-        else{
-            return false;
-        }
+    public boolean checklaserBack(){
+        return laser2.getMeasurement().distance_mm < 100;
         // return laser2.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali2;
     }
     public boolean checkCoral(){
@@ -134,6 +124,7 @@ public class Spitter extends SubsystemBase {
             return l2count == 1;
         }
     }
+
     // state [0] = intake, state [1] = posessed, state [2] = scoring
     public void periodic() {
         // If current state is intake mode, check for coral posession
@@ -141,27 +132,26 @@ public class Spitter extends SubsystemBase {
             if (laser1.getMeasurement() != null){
                 if (curr_state.equals(states[0])){
                     // FIRST, if first laser triggered
-                    if (laser2.getMeasurement().distance_mm < 100){
+                    if (checklaserBack()){
                         first = true;
                     }
                     // THEN, check when first laser is no longer triggered, second laser is trigered . Now it is posessed
-                    if (first && laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
+                    if (first && !checklaserBack() && checklaserFront()){
                         first = false;
                         inter = false;
                         OuttakeStopManual();
                         curr_state = states[1];
                     }
-                    if (laser2.getMeasurement().distance_mm < 200 && laser1.getMeasurement().distance_mm < 100){
+                    if (checklaserBack() && checklaserFront()){
                         inter = true;
                     }
                 }
                 if (curr_state.equals(states[1])){
-                    
                     OuttakeStopManual();
                 }
                 if (curr_state.equals(states[2])){
                     // First make sure laser 2 is still triggered, coral is still posessed, if not, go back to intake mode
-                    if (laser1.getMeasurement().distance_mm > 100){
+                    if (!checklaserFront()){
                         OuttakeStopManual();
                         curr_state = states[0];
                     }
@@ -169,30 +159,6 @@ public class Spitter extends SubsystemBase {
             }
         }
 
-        // if (laser)
-        // else{
-        //     l2count = 0;
-        // }
-        // if (coralPosessed != true){
-
-        //     if (laser2.getMeasurement().distance_mm > 200 && laser1.getMeasurement().distance_mm < 100){
-        //         OuttakeStopManual();
-        //         first = true;
-        //         coralPosessed = true;
-                
-                
-                
-        //     }
-        // }
-        // else{
-        //     // Ejection mode
-        //     System.out.println("ejaculrion mode: " + laser1.getMeasurement().distance_mm);
-        //     if (laser1.getMeasurement().distance_mm > 100 ){
-        //         System.out.println("not posessed anymore");
-        //         OuttakeStopManual();
-        //         coralPosessed = false;
-        //     }
-        // }
         if (curr_state.equals(states[1])){
             SmartDashboard.putBoolean("Loaded", true);
         }
@@ -200,6 +166,9 @@ public class Spitter extends SubsystemBase {
             SmartDashboard.putBoolean("Loaded", false);
         }
         
+        SmartDashboard.putBoolean("lasercanBack", checklaserBack());
+        SmartDashboard.putBoolean("lasercanFront", checklaserFront());
+
         SmartDashboard.putString("Intake state", curr_state);
     }
 }

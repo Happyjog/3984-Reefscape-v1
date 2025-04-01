@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 
 // import com.pathplanner.lib.auto.AutoBuilder;
 // import com.pathplanner.lib.auto.NamedCommands;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -49,38 +51,12 @@ import frc.robot.Constants.Elevator.elevatorShaft;
  */
 public class RobotContainer {
   // The robot's subsystems and commands
-  private final CommandXboxController driver = new CommandXboxController(1);
-  // private final CommandXboxController second = new CommandXboxController(0);
-  // private final int translationAxis = XboxController.Axis.kLeftY.value;
-  // private final int strafeAxis = XboxController.Axis.kLeftX.value;
-  // private final int rotationAxis = XboxController.Axis.kRightX.value;
-  // private final int triggerLAxis = XboxController.Axis.kLeftTrigger.value;
-  // private final int triggerRAxis = XboxController.Axis.kRightTrigger.value;
-  /*
-   * private final JoystickButton zeroGyro =
-   * new JoystickButton(driver, XboxController.Button.kY.value);
-   * private final JoystickButton aim =
-   * new JoystickButton(driver, XboxController.Button.kA.value);
-   * private final JoystickButton speaker =
-   * new JoystickButton(driver, XboxController.Button.kX.value);
-   * private final JoystickButton amp =
-   * new JoystickButton(driver, XboxController.Button.kB.value);
-   * private final JoystickButton lolintake =
-   * new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-   * private final JoystickButton slow =
-   * new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-   */
-  // private final Flywheel fwheel = new Flywheel();
-  // private final PhotonCamera cam = new PhotonCamera("Global_Shutter_Camera");
-  // private final PhotonCamera cam2 = new
-  // PhotonCamera("Microsoft_LifeCam_HD-3000");
+  private final CommandXboxController driver = new CommandXboxController(1); 
   // private final SendableChooser<Command> autoChooser;
   private final Swerve s_Swerve = new Swerve();
   private final Elevator s_Elevator = new Elevator();
   private final Climber s_Climber = new Climber();
   private final Spitter s_Spitter = new Spitter();
-  private final moveToOffset movetotag = new moveToOffset(s_Swerve, s_Swerve::getPose);
-  private final moveToRotation moveToTagR = new moveToRotation(s_Swerve, s_Swerve::getPose);
   private final moveandrotate MR_tag = new moveandrotate(s_Swerve, s_Elevator, s_Swerve::getPose);
   private final Trigger yButton = driver.y();
   private final Trigger aButton = driver.a();
@@ -97,34 +73,12 @@ public class RobotContainer {
   /* The container for the robot. subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Pathplanner commands
-    // NamedCommands.registerCommand("WaitForCoral",
-    // s_Spitter.WaitForCoralCommand());
-
-    // NamedCommands.registerCommand("ScoreL4",
-    // moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
-    // NamedCommands.registerCommand("ScoreL3",
-    // moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
-    // NamedCommands.registerCommand("ScoreL2",
-    // moveL.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
     NamedCommands.registerCommand("CoralIntake",
         new InstantCommand(() -> s_Spitter.runOutake()).andThen(new WaitCommand(5)));
-
-    // NamedCommands.registerCommand("ScoreL1",
-    // s_Elevator.setHeightPos(elevatorShaft.kLEVEL2).andThen(new
-    // InstantCommand(()->s_Spitter.runOutake())).andThen(new
-    // WaitCommand(2)).andThen(null));
     NamedCommands.registerCommand("ScoreL4", s_Elevator.setHeightPos(elevatorShaft.kLEVEL4)
         .andThen(new InstantCommand(() -> s_Spitter.runOutake())).andThen(new WaitCommand(2)).andThen(s_Elevator.resetDown()));
 
-    // NamedCommands.registerCommand("ScoreR4",
-    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL4)));
-    // NamedCommands.registerCommand("ScoreR3",
-    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL3)));
-    // NamedCommands.registerCommand("ScoreR2",
-    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL2)));
-    // NamedCommands.registerCommand("ScoreR1",
-    // moveR.andThen(s_Elevator.setHeight(elevatorShaft.kLEVEL1)));
-
+    
     // autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
     // SmartDashboard.putData("AutoChooser", autoChooser);
@@ -187,23 +141,6 @@ public class RobotContainer {
         .andThen(s_Climber.arise(Constants.Climber.kClimberIn))
         .andThen(new InstantCommand(() -> s_Climber.ratchetOn())));
 
-    // driver.start().onTrue(s_Elevator.setHeight());
-    // driver.a().onTrue(s_Climber.ratchetControl());
-    // driver.b().onTrue(translateApriltag);
-    // driver.b().onTrue(s_Swerve.moveTo(new
-    // Pose2d(s_Swerve.getPose().getX()+1,s_Swerve.getPose().getY(),
-    // s_Swerve.getPose().getRotation())));
-    // driver.x().onTrue(new InstantCommand(()->s_Swerve.setAbsolute()));
-    // second.rightTrigger(0.3).whileTrue(intake.Out());
-    // second.leftTrigger(0.3).whileTrue(fwheel.moveTo(flywheel.SPEAKER,
-    // flywheel.SPEAKER, false, ()->driver.leftTrigger(0.3).getAsBoolean(), note));
-    // second.leftTrigger(0.3).whileTrue(fwheel.speakerShot());
-    // second.a().whileTrue(intake.In());
-
-    // second.x().whileTrue(intake.moveTo(Constants.Swerve.intake.IDLE, false));
-    // second.y().whileTrue(intake.moveTo(Constants.Swerve.intake.AMPSHOT, false));
-    // second.b().whileTrue(intake.moveTo(Constants.Swerve.intake.INTAKE, true));
-
   }
 
   /**
@@ -212,6 +149,12 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("MAuto");// autoChooser.getSelected();
+    return new InstantCommand(()->{
+      if (DriverStation.getAlliance().get().equals(Alliance.Blue)){
+        s_Swerve.setGyro(180);
+      } 
+      else{ 
+        s_Swerve.zeroGyro();
+      }}).andThen(new PathPlannerAuto("MAuto"));// autoChooser.getSelected();
   }
 }

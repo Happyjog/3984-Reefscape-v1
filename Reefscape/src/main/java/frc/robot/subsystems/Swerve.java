@@ -366,6 +366,9 @@ public class Swerve extends SubsystemBase {
   public void zeroGyro() {
     gyro1.reset();
   }
+  public void setGyro(double angle){
+    gyro1.setYaw(angle);
+  }
 
   public SwerveModuleState[] getStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];

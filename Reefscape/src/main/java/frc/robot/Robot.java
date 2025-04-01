@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     // Uncomment when usbing to rio for lasercans STUPID
-    // CanBridge.runTCP();
+    CanBridge.runTCP();
     // CameraServer.startAutomaticCapture(new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera"));
     // HttpCamera httpCamera = new HttpCamera("elevator_camera", "http://10.39.84.201:1189/elevator_camera");
     // CameraServer.getInstance().addCamera(httpCamera);
@@ -57,9 +57,6 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     Alliance alliance = DriverStation.getAlliance().get();
-    if (alliance == Alliance.Blue){
-      
-    }
     m_robotContainer = new RobotContainer();
     //arm = new Arm();
   }
