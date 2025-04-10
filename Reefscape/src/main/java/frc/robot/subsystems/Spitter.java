@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import au.grapplerobotics.LaserCan;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,8 +26,9 @@ public class Spitter extends SubsystemBase {
     private LaserCan laser2;
     private int l1count = 0;
     private int l2count = 0;
-    private String[] states = {"Coral Intake", "Coral Posessed", "Coral Scoring"};
-    private String curr_state = states[0];
+    public String[] states = {"Coral Intake", "Coral Posessed", "Coral Scoring"};
+    private boolean low = false;
+    public String curr_state = states[0];
     private boolean first = false; // True is intake mode, False is scoring mode
     private boolean inter = false; // True is intake mode, False is scoring mode
 
@@ -61,8 +63,15 @@ public class Spitter extends SubsystemBase {
         
         else if(curr_state.equals(states[1])){
             curr_state = states[2];
-            outtakeMotorWS.set(.4);
-            outtakeMotor.set(-.4);
+            if (low){
+                outtakeMotorWS.set(.8);
+                outtakeMotor.set(-.8);
+            }
+            else{
+                outtakeMotorWS.set(.5);
+                outtakeMotor.set(-.5);
+            }
+            
         }
         
     }
@@ -110,10 +119,27 @@ public class Spitter extends SubsystemBase {
     }
 
     public boolean checklaserFront(){
-        return laser1.getMeasurement().distance_mm < 100;
+        if(!(laser1.getMeasurement() == null) && (laser1.getMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)){
+            if (laser1.getMeasurement().distance_mm < 100 ){
+                return true;
+            }
+            return false;
+        }else{
+            return false;
+        }
     }
     public boolean checklaserBack(){
-        return laser2.getMeasurement().distance_mm < 100;
+        if(!(laser2.getMeasurement() == null) && (laser2.getMeasurement().status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)){
+            if (laser2.getMeasurement().distance_mm < 100 ){
+                return true;
+            }
+            return false;
+        }else{
+            System.out.println("back_null");
+
+            return false;
+        }
+       
         // return laser2.getMeasurement().distance_mm < Constants.Outtake.kLaserDistCali2;
     }
     public boolean checkCoral(){
@@ -127,6 +153,18 @@ public class Spitter extends SubsystemBase {
 
     // state [0] = intake, state [1] = posessed, state [2] = scoring
     public void periodic() {
+        String level = NetworkTableInstance.getDefault().getTable("ButtonBoard").getEntry("cumber").getString("");
+        if (level.equals("L2") || level.equals("L1") || level.equals("R2") || level.equals("R1")){
+            low = true;
+        }
+        else if (level.equals("L3") || level.equals("R3") ){
+            low = false;
+
+            
+        }
+        else{
+            low = true;
+        }
         // If current state is intake mode, check for coral posession
         if (laser2.getMeasurement() != null){
             if (laser1.getMeasurement() != null){

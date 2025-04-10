@@ -131,7 +131,6 @@ public class Elevator extends SubsystemBase{
     public void reachGoal(double goal){
         double voltageOutput = MathUtils.clamp(elevatorFeedforward.calculateWithVelocities(getVelocity(), elevatorMotorProfiledPID.getSetpoint().velocity)
             + elevatorMotorProfiledPID.calculate(getPos().getDegrees()- goal), 7, -7); 
-        System.out.println("HEY GUYS LOOK AT THIS: " + getPos().getDegrees() +" "+ goal + " " + elevatorMotorProfiledPID.calculate(getPos().getDegrees()- goal));
         elevatorMotor.setVoltage(voltageOutput);
         elevatorMotorWS.setVoltage(-voltageOutput);
     }
@@ -160,14 +159,14 @@ public class Elevator extends SubsystemBase{
     public Command setHeight(){
         return run(()->{
             settingHeight=true; reachGoal(getGoalCurr()); 
-            System.out.println(Math.abs(getPos().getDegrees() - getGoalCurr()));
-        }).until(()->Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
+            // System.out.println(Math.abs(getPos().getDegrees() - getGoalCurr()));
+        }).until(()->Math.abs(getPos().getDegrees() - getGoalCurr()) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->{settingHeight=false; elevatorMotor.stopMotor(); elevatorMotorWS.stopMotor();});
     }
     public Command setHeightPos(double goal){
         return run(()->{
             settingHeight=true; reachGoal(goal); 
-            System.out.println(getPos().getDegrees());
-        }).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->settingHeight=false);
+            // System.out.println(getPos().getDegrees());
+        }).until(()->Math.abs(getPos().getDegrees() - goal) < Constants.Elevator.elevatorShaft.kErrorTolerance).andThen(()->{settingHeight=false; elevatorMotor.stopMotor(); elevatorMotorWS.stopMotor();});
     }
     public Command resetDown(){
         return run(()->{

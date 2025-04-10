@@ -83,9 +83,17 @@ public class moveandrotate extends Command{
             double o = 0;
             if (level.equals("R3") || level.equals("R2") || level.equals("R1")){
                 o = 0.18;
+                if(!isBlue){
+                    o = .14;
+                }
             }
             else if (level.equals("L3") || level.equals("L2") || level.equals("L1")){
                 o = -0.3;
+                if(!isBlue){
+                    o = -0.3;//5;
+                }
+
+                
             }
             else{
                 o = 0;

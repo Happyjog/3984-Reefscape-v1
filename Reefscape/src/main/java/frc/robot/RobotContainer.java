@@ -52,7 +52,7 @@ import frc.robot.Constants.Elevator.elevatorShaft;
 public class RobotContainer {
   // The robot's subsystems and commands
   private final CommandXboxController driver = new CommandXboxController(1); 
-  // private final SendableChooser<Command> autoChooser;
+  private final SendableChooser<Command> autoChooser;
   private final Swerve s_Swerve = new Swerve();
   private final Elevator s_Elevator = new Elevator();
   private final Climber s_Climber = new Climber();
@@ -66,6 +66,8 @@ public class RobotContainer {
   private final Trigger rightTrigger = driver.rightTrigger();
   private final Trigger leftTrigger = driver.leftTrigger();
   private final Trigger povUp = driver.povUp();
+  private final Trigger povDown = driver.povDown();
+  private final Trigger povLeft = driver.povLeft();
   // TODO Add offsets
   private final moveToOffset moveL = new moveToOffset(s_Swerve, s_Swerve::getPose);
   private final moveToOffset moveR = new moveToOffset(s_Swerve, s_Swerve::getPose);
@@ -79,9 +81,9 @@ public class RobotContainer {
         .andThen(new InstantCommand(() -> s_Spitter.runOutake())).andThen(new WaitCommand(2)).andThen(s_Elevator.resetDown()));
 
     
-    // autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = AutoBuilder.buildAutoChooser();
     // System.out.println(AutoBuilder.getAllAutoNames());
-    // SmartDashboard.putData("AutoChooser", autoChooser);
+    SmartDashboard.putData("AutoChooser", autoChooser);
     s_Swerve.setDefaultCommand(
         new TeleopSwerve(
             s_Swerve,
@@ -89,20 +91,20 @@ public class RobotContainer {
             () -> -driver.getLeftX(),
             () -> -driver.getRightX(),
             () -> false,
-            () -> driver.leftBumper().getAsBoolean(),
+            () -> driver.leftTrigger().getAsBoolean(),
             () -> driver.x().getAsBoolean()));
 
     // TODO Remove manual control later
-    s_Elevator.setDefaultCommand(
-        s_Elevator.manualShaftControl(() -> driver.leftBumper().getAsBoolean(),
-            () -> driver.rightBumper().getAsBoolean()));
+    // s_Elevator.setDefaultCommand(
+    //     s_Elevator.manualShaftControl(() -> driver.leftBumper().getAsBoolean(),
+    //         () -> driver.rightBumper().getAsBoolean()));
 
-    // s_Climber.setDefaultCommand(
-    // s_Climber.manualControl(
-    // ()-> driver.leftBumper().getAsBoolean(),
-    // ()-> driver.rightBumper().getAsBoolean(),
-    // ()-> driver.x().getAsBoolean()
-    // ));
+    s_Climber.setDefaultCommand(
+    s_Climber.manualControl(
+    ()-> driver.leftBumper().getAsBoolean(),
+    ()-> driver.rightBumper().getAsBoolean(),
+    ()-> driver.x().getAsBoolean()
+    ));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -128,16 +130,19 @@ public class RobotContainer {
     aButton.onTrue(new InstantCommand(() -> s_Spitter.runOutake()));
     // rightBumper.onTrue(new InstantCommand(() -> s_Spitter.OuttakeIn()));
     // bButton.onTrue(s_Elevator.setHeight());
-    bButton.whileTrue(MR_tag.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(() -> s_Spitter.runOutake())));
-    bButton.whileFalse(s_Elevator.resetDown());
-    backButton.onTrue(new InstantCommand(() -> System.out.println("Baka!")));
+    bButton.whileTrue(MR_tag.andThen(s_Elevator.setHeight()).andThen(new InstantCommand(() -> s_Spitter.runOutake())));//.until(()->s_Spitter.curr_state.equals(s_Spitter.states[0])));
+    bButton.onFalse(s_Elevator.resetDown());
+
+    povLeft.whileTrue(s_Elevator.setHeightPos(elevatorShaft.kLEVEL3));
+    povLeft.onFalse(s_Elevator.resetDown());
 
     rightTrigger.whileTrue(new InstantCommand(() -> s_Climber.trapOn()));
     rightTrigger.whileFalse(new InstantCommand(() -> s_Climber.trapOff()));
     povUp.onTrue(new InstantCommand(() -> s_Climber.ratchetOff())
         .andThen(new WaitCommand(1))
         .andThen(s_Climber.arise(Constants.Climber.kClimberOut)));
-    leftTrigger.onTrue(new InstantCommand(() -> s_Climber.ratchetOff())
+      
+    povDown.onTrue(new InstantCommand(() -> s_Climber.ratchetOff())
         .andThen(s_Climber.arise(Constants.Climber.kClimberIn))
         .andThen(new InstantCommand(() -> s_Climber.ratchetOn())));
 
@@ -155,6 +160,8 @@ public class RobotContainer {
       } 
       else{ 
         s_Swerve.zeroGyro();
-      }}).andThen(new PathPlannerAuto("MAuto"));// autoChooser.getSelected();
+      }}).andThen(autoChooser.getSelected());//new PathPlannerAuto("MAuto"));
+    
   }
 }
+ 

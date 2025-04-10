@@ -179,12 +179,12 @@ public final class Constants {
             public static final double kD = 0.00000; // TODO
             public static final double kS = 0; // TODO
             public static final double kG = 0.36*0.8; // TODO
-            public static final double kV = 0.001;//1.7; // TODO
-            public static final double kA = 0.0; // TODO
+            public static final double kV = 0.05;//1.7; // TODO
+            public static final double kA = 0.00; // TODO
 
-            public static final double kMaxVelocity = 0.5; // TODO
-            public static final double kMaxAcceleration = 0.5; // TODO
-            public static final double kElevatorMotorRampRate = 0.05; 
+            public static final double kMaxVelocity = 1; // TODO
+            public static final double kMaxAcceleration = 0.7; // TODO
+            public static final double kElevatorMotorRampRate = 0.1; 
             public static final double kErrorTolerance = 100;
             public static final double kFULLEXTENSION = -2022; // TODO
             public static final double kLEVEL1 = 0; 
@@ -205,12 +205,12 @@ public final class Constants {
     public static final class Climber {
         public static final int rotMotorID = 9; // climber left
         public static final double tolerance = 3.0;
-        public static final double kP = 0.15;
+        public static final double kP = 0.2;
         public static final double kI = 0;
         public static final double kD = 0;
         public static final double gearRatio = 25;
         
-        public static final double kClimberOut = 186.02936096191406;
+        public static final double kClimberOut =200.02936096191406;
         public static final double kClimberIn = 0;
     }
 
